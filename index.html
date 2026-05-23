@@ -1,913 +1,895 @@
-cat > /mnt/user-data/outputs/SpellDiviner.html << 'HTMLEOF'
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Spell Diviner">
-<title>Witch Hat — Spell Circle Diviner</title>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --gold:#c9a84c;--gold-light:#f0d080;--gold-dim:#7a5e28;
-  --bg:#06060f;--surface:#0c0c1b;--border:rgba(201,168,76,0.22);
-  --text:#c4b07a;--text-dim:#5a4e34;
-  --el:#c9a84c;--el-glow:#f0d080;--el-bg:#06060f;
-  --font:'Palatino Linotype','Book Antiqua',Palatino,serif;
-}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--el-bg);font-family:var(--font);touch-action:none;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;transition:background 1.2s ease}
-
-/* ── Layout ── */
-#app{position:fixed;inset:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);display:grid;grid-template-rows:auto 1fr auto;grid-template-columns:1fr;overflow:hidden}
-@media(min-width:860px) and (orientation:landscape){
-  #app{grid-template-rows:auto 1fr;grid-template-columns:1fr 360px}
-  #hdr{grid-column:1/-1}
-  #canvas-area{grid-column:1;grid-row:2}
-  #sidebar{grid-column:2;grid-row:2}
-  #toolbar{grid-row:unset;position:absolute;bottom:1.2rem;left:calc(50% - 180px);transform:none;width:auto;border:none;background:rgba(6,6,15,0.85);border-radius:8px;padding:0.6rem 1rem;backdrop-filter:blur(16px)}
-}
-
-/* ── Header ── */
-#hdr{display:flex;align-items:center;justify-content:space-between;padding:0.65rem 1.1rem;border-bottom:1px solid var(--border);background:rgba(6,6,15,0.88);backdrop-filter:blur(12px);z-index:20;transition:border-color 1s}
-.hdr-sub{font-size:0.58rem;letter-spacing:0.32em;text-transform:uppercase;color:var(--el);transition:color 1s}
-.hdr-title{font-size:1rem;color:var(--el-glow);letter-spacing:0.08em;text-shadow:0 0 18px var(--el);transition:all 1s;font-weight:400}
-.hdr-btns{display:flex;gap:0.45rem}
-.icon-btn{width:34px;height:34px;border:1px solid var(--border);background:transparent;color:var(--el);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
-.icon-btn:active{transform:scale(0.93);background:rgba(201,168,76,0.12)}
-.pencil-indicator{font-size:0.6rem;letter-spacing:0.08em;color:var(--text-dim);padding:0.2rem 0.5rem;border:1px solid var(--border);border-radius:3px;display:none;align-items:center;gap:0.3rem}
-.pencil-indicator.visible{display:flex}
-.pencil-dot{width:6px;height:6px;border-radius:50%;background:var(--el);box-shadow:0 0 6px var(--el);animation:pulse 1.5s ease infinite}
-
-/* ── Canvas Area ── */
-#canvas-area{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;gap:0}
-#canvas-wrap{position:relative;border-radius:50%;flex-shrink:0}
-#bg-canvas,#draw-canvas,#fx-canvas{position:absolute;top:0;left:0;border-radius:50%}
-#bg-canvas{z-index:1;pointer-events:none}
-#fx-canvas{z-index:3;pointer-events:none}
-#draw-canvas{z-index:2;touch-action:none;cursor:crosshair}
-#ring-glow{position:absolute;inset:-16px;border-radius:50%;pointer-events:none;z-index:0;transition:box-shadow 1.2s,background 1.2s;box-shadow:0 0 24px rgba(201,168,76,0.12)}
-
-/* ── Toolbar ── */
-#toolbar{display:flex;align-items:center;justify-content:center;gap:0.45rem;padding:0.7rem 1rem;border-top:1px solid var(--border);background:rgba(6,6,15,0.92);backdrop-filter:blur(12px);z-index:20;flex-wrap:wrap}
-.tool-btn{padding:0.42rem 0.9rem;border:1px solid var(--border);background:transparent;color:var(--el);font-family:var(--font);font-size:0.75rem;letter-spacing:0.07em;border-radius:3px;cursor:pointer;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
-.tool-btn:active,.tool-btn.active{background:var(--el);color:var(--bg);border-color:var(--el)}
-.cast-btn{padding:0.5rem 1.6rem;border:1px solid var(--el);background:linear-gradient(135deg,rgba(201,168,76,0.15),rgba(240,208,128,0.25));color:var(--el-glow);font-family:var(--font);font-size:0.85rem;letter-spacing:0.12em;border-radius:3px;cursor:pointer;transition:all 0.3s;box-shadow:0 0 14px rgba(201,168,76,0.15);-webkit-tap-highlight-color:transparent}
-.cast-btn:disabled{opacity:0.3;cursor:default;box-shadow:none;border-color:var(--border);color:var(--text-dim);background:transparent}
-.cast-btn:not(:disabled):active{transform:scale(0.97)}
-
-/* ── Sidebar ── */
-#sidebar{background:var(--surface);border-left:1px solid var(--border);overflow-y:auto;overflow-x:hidden;padding:1.25rem 1.1rem;display:flex;flex-direction:column;gap:1rem;transition:border-color 1s,background 1.2s;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
-#sidebar::-webkit-scrollbar{width:3px}
-#sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-@media(max-width:859px),(orientation:portrait){
-  #sidebar{border-left:none;border-top:1px solid var(--border);max-height:42vh;min-height:140px}
-}
-
-/* ── Empty / Loading ── */
-.state-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.8rem;padding:1.5rem 0}
-.state-text{font-size:0.78rem;color:var(--gold);text-align:center;line-height:1.7;letter-spacing:0.06em;opacity:0.45}
-.spin{animation:spin 3s linear infinite}
-.spin-rev{animation:spin 2s linear infinite reverse;transform-origin:center}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-
-/* ── Accuracy ── */
-.section-label{font-size:0.57rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--el);border-bottom:1px solid var(--border);padding-bottom:0.35rem;margin-bottom:0.1rem;transition:color 1s,border-color 1s}
-.grade-box{border:1px solid var(--border);border-radius:5px;padding:0.65rem 0.9rem;text-align:center;transition:border-color 1s;background:rgba(201,168,76,0.04)}
-.grade-label{font-size:0.95rem;color:var(--el-glow);letter-spacing:0.06em;transition:color 1s}
-.grade-desc{font-size:0.68rem;color:var(--text-dim);margin-top:0.3rem;line-height:1.5;font-style:italic}
-.score-row{display:flex;align-items:center;gap:0.65rem;margin-top:0.45rem}
-.score-lbl{font-size:0.67rem;color:var(--text-dim);letter-spacing:0.04em;width:105px;flex-shrink:0}
-.score-bar{flex:1;height:3px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden}
-.score-fill{height:100%;border-radius:2px;transition:width 1.3s cubic-bezier(0.4,0,0.2,1);background:linear-gradient(to right,var(--gold-dim),var(--el))}
-.score-num{font-size:0.7rem;color:var(--el);width:28px;text-align:right}
-#bar-potency .score-fill{background:linear-gradient(to right,var(--gold-dim),var(--el),var(--el-glow))}
-
-/* ── Spell Result ── */
-.spell-tags{display:flex;gap:0.35rem;flex-wrap:wrap}
-.spell-tag{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--el);border:1px solid currentColor;border-radius:2px;padding:0.12rem 0.45rem;transition:color 1s}
-.spell-name{font-size:1.4rem;color:var(--el-glow);letter-spacing:0.05em;font-weight:400;line-height:1.2;text-shadow:0 0 18px var(--el);transition:color 1s,text-shadow 1s}
-.divider{height:1px;background:linear-gradient(to right,var(--el) 30%,transparent);margin:0.1rem 0;transition:background 1s}
-.spell-desc{font-size:0.82rem;line-height:1.75;color:var(--text);font-style:italic}
-.spell-components{font-size:0.68rem;line-height:1.55;color:var(--text-dim);border-top:1px solid var(--border);padding-top:0.65rem;margin-top:0.1rem}
-.spell-lore{font-size:0.68rem;line-height:1.6;color:var(--text-dim);border-top:1px solid var(--border);padding-top:0.65rem;font-style:italic}
-.reveal{animation:fadeUp 0.6s ease both}
-.pressure-bar-wrap{display:flex;align-items:center;gap:0.5rem;margin-top:0.3rem}
-.pressure-label{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.05em}
-.pressure-bar{flex:1;height:2px;background:rgba(255,255,255,0.05);border-radius:1px}
-.pressure-fill{height:100%;border-radius:1px;background:var(--el);transition:width 0.1s}
-</style>
-</head>
-<body>
-<div id="app">
-
-<!-- HEADER -->
-<header id="hdr">
-  <div>
-    <div class="hdr-sub">Witch Hat Atelier</div>
-    <div class="hdr-title">Spell Circle Diviner</div>
-  </div>
-  <div class="hdr-btns">
-    <div class="pencil-indicator" id="pencil-ind">
-      <div class="pencil-dot"></div>✏︎ Pencil
-    </div>
-    <button class="icon-btn" id="fs-btn" title="Fullscreen">
-      <svg id="fs-icon-expand" width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.6">
-        <path d="M1 1h4M1 1v4M14 1h-4M14 1v4M1 14h4M1 14v-4M14 14h-4M14 14v-4"/>
-      </svg>
-      <svg id="fs-icon-exit" width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.6" style="display:none">
-        <path d="M5 1v4H1M10 1v4h4M5 14v-4H1M10 14v-4h4"/>
-      </svg>
-    </button>
-  </div>
-</header>
-
-<!-- CANVAS -->
-<div id="canvas-area">
-  <div id="canvas-wrap">
-    <div id="ring-glow"></div>
-    <canvas id="bg-canvas"></canvas>
-    <canvas id="draw-canvas"></canvas>
-    <canvas id="fx-canvas"></canvas>
-  </div>
-</div>
-
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <!-- Empty state -->
-  <div class="state-center" id="state-empty">
-    <svg width="54" height="54" viewBox="0 0 54 54" opacity="0.45">
-      <circle cx="27" cy="27" r="23" fill="none" stroke="#c9a84c" stroke-width="1" stroke-dasharray="4.5 3.5"/>
-      <circle cx="27" cy="27" r="13" fill="none" stroke="#c9a84c" stroke-width="0.7" stroke-dasharray="3 3" opacity="0.6"/>
-      <circle cx="27" cy="27" r="3" fill="#c9a84c" opacity="0.7"/>
-      <line x1="27" y1="14" x2="27" y2="11" stroke="#c9a84c" stroke-width="1.5"/>
-      <line x1="27" y1="40" x2="27" y2="43" stroke="#c9a84c" stroke-width="1.5"/>
-      <line x1="14" y1="27" x2="11" y2="27" stroke="#c9a84c" stroke-width="1.5"/>
-      <line x1="40" y1="27" x2="43" y2="27" stroke="#c9a84c" stroke-width="1.5"/>
-    </svg>
-    <div class="state-text">Draw your glyph within the circle<br>then divine its power</div>
-  </div>
-
-  <!-- Loading state -->
-  <div class="state-center" id="state-loading" style="display:none">
-    <svg width="50" height="50" viewBox="0 0 50 50" class="spin">
-      <circle cx="25" cy="25" r="21" fill="none" stroke="#c9a84c" stroke-width="1" stroke-dasharray="7 5" opacity="0.55"/>
-      <circle cx="25" cy="25" r="13" fill="none" stroke="#f0d080" stroke-width="0.8" stroke-dasharray="4 4" opacity="0.4" class="spin-rev"/>
-      <circle cx="25" cy="25" r="3" fill="#c9a84c"/>
-    </svg>
-    <div class="state-text" style="opacity:1;animation:pulse 1.8s ease infinite">Consulting the Great Library…</div>
-  </div>
-
-  <!-- Result -->
-  <div id="state-result" style="display:none" class="reveal">
-    <!-- Accuracy -->
-    <div class="section-label">Inscription Quality</div>
-    <div class="grade-box">
-      <div class="grade-label" id="r-grade">—</div>
-      <div class="grade-desc" id="r-grade-desc">—</div>
-    </div>
-    <div id="score-rows">
-      <div class="score-row">
-        <div class="score-lbl">Stroke Purity</div>
-        <div class="score-bar"><div class="score-fill" id="b-smooth" style="width:0%"></div></div>
-        <div class="score-num" id="n-smooth">—</div>
-      </div>
-      <div class="score-row">
-        <div class="score-lbl">Seal Balance</div>
-        <div class="score-bar"><div class="score-fill" id="b-balance" style="width:0%"></div></div>
-        <div class="score-num" id="n-balance">—</div>
-      </div>
-      <div class="score-row">
-        <div class="score-lbl">Line Confidence</div>
-        <div class="score-bar"><div class="score-fill" id="b-conf" style="width:0%"></div></div>
-        <div class="score-num" id="n-conf">—</div>
-      </div>
-      <div class="score-row" id="row-potency">
-        <div class="score-lbl">Spell Potency</div>
-        <div class="score-bar" id="bar-potency"><div class="score-fill" id="b-potency" style="width:0%"></div></div>
-        <div class="score-num" id="n-potency">—</div>
-      </div>
-    </div>
-
-    <!-- Spell -->
-    <div class="section-label" style="margin-top:0.3rem">Spell Identification</div>
-    <div class="spell-tags" id="r-tags"></div>
-    <div class="spell-name" id="r-name">—</div>
-    <div class="divider"></div>
-    <div class="spell-desc" id="r-desc">—</div>
-    <div class="spell-components" id="r-components">—</div>
-    <div class="spell-lore" id="r-lore"></div>
-  </div>
-</div>
-
-<!-- TOOLBAR -->
-<div id="toolbar">
-  <button class="tool-btn active" id="btn-pen">✒ Quill</button>
-  <button class="tool-btn" id="btn-erase">◻ Erase</button>
-  <button class="tool-btn" id="btn-clear">↺ Clear</button>
-  <div class="pressure-bar-wrap" id="pressure-wrap" style="display:none">
-    <div class="pressure-label">Pressure</div>
-    <div class="pressure-bar"><div class="pressure-fill" id="pressure-fill" style="width:0%"></div></div>
-  </div>
-  <button class="cast-btn" id="btn-cast" disabled>✦ Divine the Spell</button>
-</div>
-</div><!-- #app -->
-
-<script>
-// ═══════════════════════════════════════════════════════
-//  CONSTANTS & THEMES
-// ═══════════════════════════════════════════════════════
-const THEMES = {
-  Fire:  {c:'#ff6a3d',g:'#ffaa60',bg:'#130400',pc:['#ff6a3d','#ff9f1c','#ffcc02','rgba(255,200,100,0.6)']},
-  Water: {c:'#3dbdff',g:'#90e8ff',bg:'#000f1c',pc:['#00b4d8','#90e0ef','#caf0f8','rgba(150,230,255,0.5)']},
-  Earth: {c:'#c8a060',g:'#e8c890',bg:'#0f0700',pc:['#8b5e3c','#a07850','#6b8f47','#c8a87a']},
-  Wind:  {c:'#a8ffcc',g:'#d0ffe8',bg:'#001a0a',pc:['#a8ffd0','#d0ffe8','rgba(200,255,220,0.5)','#fff']},
-  Light: {c:'#fff8c0',g:'#ffffff', bg:'#141200',pc:['#fff','rgba(255,253,230,0.9)','rgba(255,245,150,0.7)','rgba(240,220,80,0.5)']},
-  Arcane:{c:'#cc60ff',g:'#f0a0ff',bg:'#090014',pc:['#9c27b0','#ce93d8','#e040fb','rgba(200,100,255,0.5)']},
-};
-function getTheme(el){
-  if(!el) return THEMES.Arcane;
-  const k = Object.keys(THEMES).find(k=>el.toLowerCase().includes(k.toLowerCase()));
-  return THEMES[k]||THEMES.Arcane;
-}
-
-// ═══════════════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════════════
-const S = {
-  tool:'pen',
-  strokes:[],         // [{pts:[{x,y,p}...], eraser:bool}]
-  cur:null,           // current stroke being drawn
-  hasDrawn:false,
-  loading:false,
-  size:400,           // canvas CSS size (square)
-  dpr:1,
-  particles:[],
-  fxRafId:null,
-  theme:null,
-  lastPressure:0.5,
-};
-
-// ═══════════════════════════════════════════════════════
-//  CANVAS SETUP
-// ═══════════════════════════════════════════════════════
-const bgC  = document.getElementById('bg-canvas');
-const drC  = document.getElementById('draw-canvas');
-const fxC  = document.getElementById('fx-canvas');
-const bgX  = bgC.getContext('2d');
-const drX  = drC.getContext('2d');
-const fxX  = fxC.getContext('2d');
-const wrap = document.getElementById('canvas-wrap');
-const glow = document.getElementById('ring-glow');
-
-function resizeAll(){
-  const area = document.getElementById('canvas-area');
-  const r = area.getBoundingClientRect();
-  const pad = 24;
-  // In landscape with sidebar, the canvas-area is the left portion
-  const maxW = r.width  - pad*2;
-  const maxH = r.height - pad*2;
-  const sz = Math.max(240, Math.min(maxW, maxH, 680));
-  S.size = sz;
-  S.dpr  = Math.min(window.devicePixelRatio||1, 3);
-
-  wrap.style.width  = sz+'px';
-  wrap.style.height = sz+'px';
-
-  [bgC,drC,fxC].forEach(c=>{
-    c.width  = sz*S.dpr;
-    c.height = sz*S.dpr;
-    c.style.width  = sz+'px';
-    c.style.height = sz+'px';
-  });
-
-  // Rescale contexts
-  bgX.setTransform(1,0,0,1,0,0); bgX.scale(S.dpr,S.dpr);
-  drX.setTransform(1,0,0,1,0,0); drX.scale(S.dpr,S.dpr);
-  fxX.setTransform(1,0,0,1,0,0); fxX.scale(S.dpr,S.dpr);
-
-  drawBg();
-  redrawStrokes();
-}
-
-function drawBg(){
-  const s=S.size, cx=s/2, cy=s/2, r=s/2-14;
-  bgX.clearRect(0,0,s,s);
-  bgX.fillStyle='#06060f';
-  bgX.fillRect(0,0,s,s);
-
-  // Outer ring
-  bgX.shadowColor='rgba(240,208,128,0.4)';
-  bgX.shadowBlur=10;
-  bgX.strokeStyle='rgba(201,168,76,0.75)';
-  bgX.lineWidth=2;
-  bgX.beginPath(); bgX.arc(cx,cy,r,0,Math.PI*2); bgX.stroke();
-  bgX.shadowBlur=0;
-
-  // Cardinal tick marks
-  for(let i=0;i<8;i++){
-    const a=(i*Math.PI/4)-Math.PI/2;
-    const major=i%2===0;
-    const len=major?15:9;
-    bgX.beginPath();
-    bgX.moveTo(cx+(r-2)*Math.cos(a), cy+(r-2)*Math.sin(a));
-    bgX.lineTo(cx+(r-len)*Math.cos(a), cy+(r-len)*Math.sin(a));
-    bgX.strokeStyle=`rgba(201,168,76,${major?0.85:0.45})`;
-    bgX.lineWidth=major?2:1.5;
-    bgX.stroke();
-  }
-
-  // Small ring of rune-like dots
-  for(let i=0;i<32;i++){
-    if(i%4===0) continue;
-    const a=(i/32)*Math.PI*2-Math.PI/2;
-    const rx=cx+(r+9)*Math.cos(a), ry=cy+(r+9)*Math.sin(a);
-    if(rx>2&&rx<s-2&&ry>2&&ry<s-2){
-      bgX.beginPath(); bgX.arc(rx,ry,0.9,0,Math.PI*2);
-      bgX.fillStyle='rgba(201,168,76,0.3)'; bgX.fill();
-    }
-  }
-
-  // Inner guide ring (very faint)
-  bgX.strokeStyle='rgba(201,168,76,0.08)';
-  bgX.lineWidth=1;
-  bgX.setLineDash([3,6]);
-  bgX.beginPath(); bgX.arc(cx,cy,r*0.55,0,Math.PI*2); bgX.stroke();
-  bgX.setLineDash([]);
-
-  // Center crosshair (very faint)
-  bgX.strokeStyle='rgba(201,168,76,0.1)';
-  bgX.lineWidth=0.8;
-  bgX.beginPath(); bgX.moveTo(cx-12,cy); bgX.lineTo(cx+12,cy); bgX.stroke();
-  bgX.beginPath(); bgX.moveTo(cx,cy-12); bgX.lineTo(cx,cy+12); bgX.stroke();
-}
-
-function redrawStrokes(){
-  drX.clearRect(0,0,S.size,S.size);
-  S.strokes.forEach(renderStroke);
-}
-
-// ═══════════════════════════════════════════════════════
-//  DRAWING
-// ═══════════════════════════════════════════════════════
-function renderStroke(stroke){
-  const pts=stroke.pts;
-  if(pts.length<2) return;
-  drX.lineCap='round'; drX.lineJoin='round';
-  for(let i=1;i<pts.length;i++){
-    const p0=pts[i-1], p1=pts[i];
-    const lw=stroke.eraser?26:(1.2+(p1.p||0.5)*2.8);
-    drX.beginPath();
-    drX.moveTo(p0.x*S.size, p0.y*S.size);
-    drX.lineTo(p1.x*S.size, p1.y*S.size);
-    if(stroke.eraser){
-      drX.globalCompositeOperation='destination-out';
-      drX.strokeStyle='rgba(0,0,0,1)';
-      drX.lineWidth=lw;
-      drX.stroke();
-      drX.globalCompositeOperation='source-over';
-    } else {
-      drX.shadowColor='rgba(240,208,128,0.55)';
-      drX.shadowBlur=5;
-      drX.strokeStyle='rgba(201,168,76,0.92)';
-      drX.lineWidth=lw;
-      drX.stroke();
-      drX.shadowBlur=0;
-    }
-  }
-}
-
-function renderSegment(p0,p1,eraser,pressure){
-  if(!p0||!p1) return;
-  const lw=eraser?26:(1.2+(pressure||0.5)*2.8);
-  drX.lineCap='round'; drX.lineJoin='round';
-  drX.beginPath();
-  drX.moveTo(p0.x*S.size, p0.y*S.size);
-  drX.lineTo(p1.x*S.size, p1.y*S.size);
-  if(eraser){
-    drX.globalCompositeOperation='destination-out';
-    drX.strokeStyle='rgba(0,0,0,1)';
-    drX.lineWidth=lw; drX.stroke();
-    drX.globalCompositeOperation='source-over';
-  } else {
-    drX.shadowColor='rgba(240,208,128,0.55)';
-    drX.shadowBlur=5;
-    drX.strokeStyle='rgba(201,168,76,0.92)';
-    drX.lineWidth=lw; drX.stroke();
-    drX.shadowBlur=0;
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-//  POINTER EVENTS (mouse / touch / Apple Pencil)
-// ═══════════════════════════════════════════════════════
-let prevPt=null;
-
-drC.addEventListener('pointerdown',e=>{
-  e.preventDefault();
-  drC.setPointerCapture(e.pointerId);
-  const pos=norm(e);
-  S.cur={pts:[{...pos,p:e.pressure||0.5}], eraser:S.tool==='eraser'};
-  prevPt=pos;
-  showPressure(e);
-  if(e.pointerType==='pen') document.getElementById('pencil-ind').classList.add('visible');
-},{passive:false});
-
-drC.addEventListener('pointermove',e=>{
-  e.preventDefault();
-  showPressure(e);
-  if(!S.cur) return;
-  const pos=norm(e);
-  // Minimum distance filter
-  if(prevPt && Math.hypot((pos.x-prevPt.x)*S.size,(pos.y-prevPt.y)*S.size)<0.8) return;
-  const pt={...pos,p:e.pressure||0.5};
-  renderSegment(prevPt?{...prevPt}:null, pos, S.cur.eraser, pt.p);
-  S.cur.pts.push(pt);
-  prevPt=pos;
-  if(!S.hasDrawn && !S.cur.eraser){
-    S.hasDrawn=true;
-    document.getElementById('btn-cast').disabled=false;
-  }
-},{passive:false});
-
-drC.addEventListener('pointerup',e=>{
-  e.preventDefault();
-  hidePressure();
-  if(!S.cur) return;
-  if(S.cur.pts.length>1) S.strokes.push(S.cur);
-  S.cur=null; prevPt=null;
-  if(S.tool==='eraser') redrawStrokes();
-},{passive:false});
-
-drC.addEventListener('pointercancel',e=>{
-  if(S.cur){S.strokes.push(S.cur); S.cur=null;}
-  prevPt=null; hidePressure();
-});
-
-function norm(e){
-  const r=drC.getBoundingClientRect();
-  return {x:(e.clientX-r.left)/r.width, y:(e.clientY-r.top)/r.height};
-}
-
-function showPressure(e){
-  if(e.pointerType==='pen'){
-    const pf=document.getElementById('pressure-fill');
-    const pw=document.getElementById('pressure-wrap');
-    pw.style.display='flex';
-    pf.style.width=(e.pressure*100)+'%';
-  }
-}
-function hidePressure(){
-  // Keep visible if pencil was used
-}
-
-// ═══════════════════════════════════════════════════════
-//  ACCURACY ANALYSIS
-// ═══════════════════════════════════════════════════════
-function analyzeAccuracy(){
-  const ink=S.strokes.filter(s=>!s.eraser && s.pts.length>1);
-  if(ink.length===0) return null;
-
-  const all=ink.flatMap(s=>s.pts);
-
-  // 1. STROKE PURITY — penalize angular jitter (squiggly lines)
-  let jitterSum=0, jitterN=0;
-  for(const stroke of ink){
-    const pts=stroke.pts;
-    for(let i=1;i<pts.length-1;i++){
-      const p1=pts[i-1],p2=pts[i],p3=pts[i+1];
-      const dx1=(p2.x-p1.x)*S.size, dy1=(p2.y-p1.y)*S.size;
-      const dx2=(p3.x-p2.x)*S.size, dy2=(p3.y-p2.y)*S.size;
-      const l1=Math.hypot(dx1,dy1), l2=Math.hypot(dx2,dy2);
-      if(l1<0.4||l2<0.4) continue;
-      const dot=(dx1*dx2+dy1*dy2)/(l1*l2);
-      jitterSum+=Math.acos(Math.max(-1,Math.min(1,dot)));
-      jitterN++;
-    }
-  }
-  const avgJ=jitterN>0?jitterSum/jitterN:0;
-  // Scale: 0 rad=100, 0.5 rad=0 (0.5rad≈28.6° average change is very squiggly)
-  const strokePurity=Math.round(Math.max(0,Math.min(100,(1-avgJ/0.55)*100)));
-
-  // 2. SEAL BALANCE — check distribution across 8 sectors of the circle interior
-  const cx=all.reduce((s,p)=>s+p.x,0)/all.length;
-  const cy=all.reduce((s,p)=>s+p.y,0)/all.length;
-  const sectors=new Array(8).fill(0);
-  for(const p of all){
-    const a=Math.atan2(p.y-cy,p.x-cx);
-    const idx=Math.floor(((a+Math.PI)/(Math.PI*2))*8)%8;
-    sectors[idx]++;
-  }
-  const mean=sectors.reduce((a,b)=>a+b,0)/8;
-  const variance=sectors.reduce((s,v)=>s+(v-mean)**2,0)/8;
-  const cv=mean>0?Math.sqrt(variance)/mean:1;
-  // cv=0 means perfectly balanced, cv=1+ means very unbalanced
-  const sealBalance=Math.round(Math.max(0,Math.min(100,(1-Math.min(cv,1.4)/1.4)*100)));
-
-  // 3. LINE CONFIDENCE — average segment length (longer decisive strokes = higher score)
-  let totalLen=0, totalSegs=0;
-  for(const stroke of ink){
-    const pts=stroke.pts;
-    for(let i=1;i<pts.length;i++){
-      const dx=(pts[i].x-pts[i-1].x)*S.size, dy=(pts[i].y-pts[i-1].y)*S.size;
-      totalLen+=Math.hypot(dx,dy);
-      totalSegs++;
-    }
-  }
-  const avgSegLen=totalSegs>0?totalLen/totalSegs:0;
-  // Short choppy strokes (<3px avg) = 0, long decisive strokes (>15px avg) = 100
-  const lineConf=Math.round(Math.max(0,Math.min(100,(avgSegLen-0.5)/18*100)));
-
-  // POTENCY — weighted combination
-  const potency=Math.round(0.38*strokePurity + 0.32*sealBalance + 0.30*lineConf);
-
-  return {strokePurity,sealBalance,lineConf,potency,grade:grade(potency)};
-}
-
-function grade(p){
-  if(p>=90) return{l:'Master Sigil',d:'A transcendent inscription. Your precision rivals the Three Wise themselves.'};
-  if(p>=74) return{l:'Expert Seal',d:'Practiced and confident. Worthy of a senior apprentice.'};
-  if(p>=54) return{l:'Journeyman Mark',d:'Functional, though imperfections may shorten the spell\'s duration.'};
-  if(p>=34) return{l:'Apprentice Scratch',d:'Rough and trembling. The spell may misfire or weaken unpredictably.'};
-  return      {l:'Unformed Scrawl',d:'The conjuring ink barely recognizes this shape. Begin anew with a steadier hand.'};
-}
-
-// ═══════════════════════════════════════════════════════
-//  PARTICLE SYSTEM
-// ═══════════════════════════════════════════════════════
-class P{
-  constructor(x,y,el){
-    const th=getTheme(el);
-    this.x=x; this.y=y;
-    this.el=el||'Arcane';
-    this.col=th.pc[Math.floor(Math.random()*th.pc.length)];
-    const spd=1.5+Math.random()*4.5;
-    const ang=Math.random()*Math.PI*2;
-    this.vx=Math.cos(ang)*spd; this.vy=Math.sin(ang)*spd;
-    this.life=0; this.maxL=50+Math.random()*90;
-    this.sz=1.5+Math.random()*4; this.rot=Math.random()*Math.PI*2;
-    this.rotSpd=(Math.random()-0.5)*0.25;
-  }
-  tick(){
-    this.life++;
-    const el=this.el.toLowerCase();
-    if(el.includes('fire')){
-      this.vy-=0.07; this.vx+=(Math.random()-0.5)*0.18; this.sz*=0.988;
-    } else if(el.includes('water')){
-      this.vy+=0.055; this.vx*=0.97; this.vx+=Math.sin(this.life*0.14)*0.12;
-    } else if(el.includes('wind')){
-      const ang=Math.atan2(this.vy,this.vx)+0.055;
-      const spd=Math.hypot(this.vx,this.vy)*0.985;
-      this.vx=Math.cos(ang)*spd; this.vy=Math.sin(ang)*spd;
-    } else if(el.includes('earth')){
-      this.vy+=0.13; this.vx*=0.97;
-    } else if(el.includes('light')){
-      this.vx*=0.93; this.vy*=0.93; this.sz*=0.96;
-    } else {
-      const ang=Math.atan2(this.vy,this.vx)+0.045;
-      const spd=Math.hypot(this.vx,this.vy)*0.978;
-      this.vx=Math.cos(ang)*spd; this.vy=Math.sin(ang)*spd;
-    }
-    this.x+=this.vx; this.y+=this.vy; this.rot+=this.rotSpd;
-    return this.life<this.maxL;
-  }
-  draw(ctx){
-    const t=this.life/this.maxL;
-    const alpha=Math.sin(t*Math.PI)*0.85;
-    ctx.save();
-    ctx.globalAlpha=alpha;
-    ctx.translate(this.x,this.y); ctx.rotate(this.rot);
-    ctx.fillStyle=this.col; ctx.shadowColor=this.col; ctx.shadowBlur=this.sz*2.5;
-    ctx.beginPath();
-    if(this.el.toLowerCase().includes('light')){
-      // Star shape for light
-      const r=this.sz*(1-t*0.4), r2=r*0.4;
-      ctx.moveTo(0,-r);
-      for(let i=1;i<8;i++){
-        const a=(i*Math.PI/4)-(Math.PI/2);
-        const rr=i%2===0?r:r2;
-        ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr);
-      }
-      ctx.closePath();
-    } else {
-      ctx.arc(0,0,this.sz*(1-t*0.5),0,Math.PI*2);
-    }
-    ctx.fill();
-    ctx.restore();
-  }
-}
-
-function spawnParticles(el){
-  const s=S.size, cx=s/2, cy=s/2;
-  const n=el.toLowerCase().includes('light')?100:60;
-  for(let i=0;i<n;i++){
-    const fromRing=Math.random()>0.35;
-    let x,y;
-    if(fromRing){
-      const r=s/2-14, a=Math.random()*Math.PI*2;
-      x=cx+r*Math.cos(a); y=cy+r*Math.sin(a);
-    } else {
-      x=cx+(Math.random()-0.5)*80; y=cy+(Math.random()-0.5)*80;
-    }
-    S.particles.push(new P(x,y,el));
-  }
-  if(!S.fxRafId) fxLoop();
-}
-
-function fxLoop(){
-  const s=S.size;
-  fxX.clearRect(0,0,s,s);
-  S.particles=S.particles.filter(p=>p.tick());
-  S.particles.forEach(p=>p.draw(fxX));
-  if(S.particles.length>0) S.fxRafId=requestAnimationFrame(fxLoop);
-  else{ S.fxRafId=null; fxX.clearRect(0,0,s,s); }
-}
-
-// ═══════════════════════════════════════════════════════
-//  WHA SYSTEM PROMPT & API CALL
-// ═══════════════════════════════════════════════════════
-const WHA_PROMPT=`You are a master glyph scholar in the world of Witch Hat Atelier (Tongari Boushi no Atorie) by Kamome Shirahama. Identify spell glyphs drawn on spell circles with expert precision.
-
-═══ THE WITCH HAT ATELIER MAGIC SYSTEM ═══
-
-CORE PRINCIPLE: Magic is performed entirely through drawing glyphs with special conjuring ink made from the Silverwood Tree. Skill in drawing — not innate talent — determines power. Anyone who learns to draw correctly can wield magic.
-
-A GLYPH'S THREE COMPONENTS:
-1. SIGIL (center of glyph) — defines the element:
-   • FIRE sigil — heat, combustion, flame projection, explosive force, also produces light via heat
-   • WATER sigil — liquid manipulation, pressure, flow, mist, wave generation, freezing water  
-   • EARTH sigil — stone, soil, sand, dust, crystal, solid matter; manipulation and destruction
-   • WIND sigil (also called Air) — air currents, propulsion, levitation, breath, pressure waves
-   • LIGHT sigil — illumination, vision magic, revelation, reflection, blinding, bending of light
-   • CRYSTAL sigil (Earth variant) — transparent solid forms, ice-like crystal structures
-   • AERIFORMS sigil (Wind variant) — maintaining/shaping gas clouds, mist walls
-
-2. SIGNS/KEYSTONES (arranged around sigil in radial or bilateral symmetry) — define HOW element manifests:
-   • Column/Beam sign → directs element in focused column or beam (like Pyreball Seal)
-   • Dispersion sign → spreads element outward in all directions (like a burst)
-   • Levitation keystone → lifts and suspends objects against gravity
-   • Wall/Barrier sign → forms element into a solid barrier or wall
-   • Expansion sign → enlarges objects (Floating Expansion Seal)
-   • Reduction sign (Expansion reversed) → shrinks objects (Spell of Reduction)
-   • Repetition sign → loops or sustains the spell continuously
-   • Billowing sign → produces large volumes of the element
-   • Serpent/Coil sign → makes element travel in winding snake-like path
-   • Knot sign → binds or constrains target
-   • Directional arrow signs → guide projection direction
-   • Vision sign → sight, scrying, or optical effects
-   • Integration sign → reforms matter from fragments or dust (Integration Seal)
-   • Destruction sign → breaks down solid matter to particles (Wall Breaker variant)
-   SIGN RULE: Radial symmetry = symmetric/omnidirectional effect; Bilateral = directional; Asymmetric = unstable but valid
-   REVERSAL RULE: Drawing a sign mirrored exactly reverses its function (expansion ↔ reduction, rise ↔ fall)
-
-3. RING (outer circle) — must be COMPLETE to activate the spell; a gap keeps it dormant (toggleable)
-
-QUALITY RULE: Larger seals are more powerful. Neater inscriptions last longer. Messy or imprecise glyphs produce weakened, unstable, or misfired effects.
-
-═══ NAMED SPELLS AS REFERENCE ═══
-• Pyreball Seal — fire + column/projectile signs → launches a fireball
-• Wall Breaker Seal — earth + destruction/impact → shatters stone walls, crumbles rock
-• Sylph Shoes Seal — wind + propulsion + underfoot (split seal on shoe soles, activates on step)
-• Glowstone Seal — light + dispersion + repetition → sustained ambient illumination (contraption)
-• Serpent's Bed of Sand — sand/earth + coil + expansion → creates undulating sand terrain
-• Floating Expansion Seal — levitation + expansion → lifts and enlarges objects
-• Spell of Reduction — levitation reversed + reduction → shrinks objects down
-• Integration Seal — earth + reformation → reconstitutes objects from fragments/dust
-• Repetition Seal — repetition sign as center → causes enclosed effect to loop
-• Cloak Spell — nested light + concealment signs → bends light for invisibility
-• Mirror Mantle — light + reflection → deflects incoming spells (used by Knights Moralis)
-• Memory Erasure — forbidden; affects the mind directly (body-affecting magic)
-• Link Rings — two identical half-seals; activate when physically pressed together
-• Sealchair — many linked sigils chained by connecting lines; creates animated chair
-• Snugstone — warmth contraption; earth-based heat retention
-• Myrphon Summoning — complex nested glyph invoking creature bond
-
-═══ ADVANCED GLYPH TECHNIQUES ═══
-• Nested Glyphs: ring within ring; inner activates only when outer ring is complete
-• Linked Seals: two circles connected by a line; their effects combine
-• Spell Toggling: split seal across two objects; activates when objects join
-• Body-Affecting Magic: FORBIDDEN — cannot be drawn on or affecting living bodies
-
-═══ ANALYSIS INSTRUCTIONS ═══
-Look carefully at the image. The background is dark (#06060f), the ring and glyph appear in gold/amber. A pre-drawn outer circle serves as the ring. The user drew the INNER glyph (sigil + signs).
-
-Identify:
-- What shape is in or near the center? → determines sigil/element
-- What shapes/marks surround it? → determines signs/effect
-- Is there bilateral or radial arrangement? → determines directionality
-- Are there nested circles, connecting lines? → advanced technique
-
-Be SPECIFIC and PRECISE. Name spells as they would appear in the Great Library: "[Descriptive word] [Type]" e.g. "Pyreball Seal", "Serpent's Bed of Sand", "Gravity Reversal Seal", "Tidal Column Seal", "Dust Integration Seal". Avoid vague names.
-
-Respond ONLY with a valid JSON object, no markdown fences, no text outside it:
-{
-  "name": "Precise 2-5 word spell name in WHA naming style",
-  "element": "Fire|Water|Earth|Wind|Light|Arcane",
-  "sigil_identified": "What you see in the center and what element it suggests",
-  "signs_identified": "Describe the surrounding marks and what signs/keystones they represent",
-  "description": "2-3 sentences describing EXACTLY what this spell does — the physical manifestation, direction, behavior, and any notable properties — written in the precise scholarly voice of the Great Library of Spells",
-  "effect_type": "Combat|Utility|Movement|Environmental|Contraption|Forbidden",
-  "complexity": "Simple Glyph|Compound Seal|Linked Array|Nested Sigil",
-  "stability_note": "One sentence about whether the glyph's proportions/symmetry suggest the spell would be stable or might misfire, and how",
-  "lore_note": "One sentence of in-world lore about this class of spell, its historical use, or any known practitioners"
-}`;
-
-async function divineSpell(){
-  if(!S.hasDrawn||S.loading) return;
-  S.loading=true;
-  setState('loading');
-
-  const acc=analyzeAccuracy();
-
-  // Capture drawing
-  const composite=document.createElement('canvas');
-  composite.width=bgC.width; composite.height=bgC.height;
-  const cx2=composite.getContext('2d');
-  cx2.drawImage(bgC,0,0);
-  cx2.drawImage(drC,0,0);
-  const imgData=composite.toDataURL('image/jpeg',0.93).split(',')[1];
-
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system:WHA_PROMPT,
-        messages:[{
-          role:'user',
-          content:[
-            {type:'image',source:{type:'base64',media_type:'image/jpeg',data:imgData}},
-            {type:'text',text:'Identify this spell glyph precisely. Examine the center for the sigil element, the surrounding marks for signs/keystones, and give the exact spell name and effects.'}
-          ]
-        }]
-      })
-    });
-    const data=await res.json();
-    const raw=data.content.map(c=>c.text||'').join('');
-    const clean=raw.replace(/```json|```/g,'').trim();
-    const spell=JSON.parse(clean);
-    renderResult(spell,acc);
-    applyTheme(spell.element);
-    spawnParticles(spell.element);
-  } catch(e){
-    renderResult({
-      name:'Unreadable Inscription',element:'Arcane',
-      sigil_identified:'Indeterminate',signs_identified:'Pattern defies known catalogs',
-      description:'This glyph resists all scholarly interpretation. Its composition is unlike any inscription recorded in the Great Library — either an artifact of a lost magical tradition, or a seal too imprecise to yield a coherent reading.',
-      effect_type:'Unknown',complexity:'Unknown',
-      stability_note:'Without a clear pattern, the spell\'s behavior cannot be predicted.',
-      lore_note:'The Brimmed Hats are rumored to use intentionally obscured glyphs to foil the Knights Moralis.'
-    },acc);
-    applyTheme('Arcane');
-    spawnParticles('Arcane');
-  }
-  S.loading=false;
-}
-
-// ═══════════════════════════════════════════════════════
-//  UI RENDERING
-// ═══════════════════════════════════════════════════════
-function setState(s){
-  document.getElementById('state-empty').style.display=s==='empty'?'flex':'none';
-  document.getElementById('state-loading').style.display=s==='loading'?'flex':'none';
-  document.getElementById('state-result').style.display=s==='result'?'block':'none';
-}
-
-function renderResult(spell,acc){
-  setState('result');
-  const el=document.getElementById('state-result');
-  el.classList.remove('reveal'); void el.offsetWidth; el.classList.add('reveal');
-
-  // Accuracy
-  if(acc){
-    setTimeout(()=>{
-      setScore('smooth',acc.strokePurity);
-      setScore('balance',acc.sealBalance);
-      setScore('conf',acc.lineConf);
-      setScore('potency',acc.potency);
-      document.getElementById('r-grade').textContent=acc.grade.l;
-      document.getElementById('r-grade-desc').textContent=acc.grade.d;
-    },120);
-  }
-
-  // Tags
-  const tagsEl=document.getElementById('r-tags');
-  tagsEl.innerHTML='';
-  [spell.element,spell.effect_type,spell.complexity].filter(Boolean).forEach(t=>{
-    const s=document.createElement('span');
-    s.className='spell-tag'; s.textContent=t; tagsEl.appendChild(s);
-  });
-
-  document.getElementById('r-name').textContent=spell.name||'—';
-  document.getElementById('r-desc').textContent=spell.description||'—';
-
-  const parts=[];
-  if(spell.sigil_identified) parts.push('Sigil → '+spell.sigil_identified);
-  if(spell.signs_identified)  parts.push('Signs → '+spell.signs_identified);
-  if(spell.stability_note)    parts.push(spell.stability_note);
-  document.getElementById('r-components').textContent=parts.join('\n\n');
-
-  document.getElementById('r-lore').textContent=spell.lore_note?'"'+spell.lore_note+'"':'';
-}
-
-function setScore(id,val){
-  const v=Math.max(0,Math.min(100,val));
-  document.getElementById('b-'+id).style.width=v+'%';
-  document.getElementById('n-'+id).textContent=v;
-}
-
-function applyTheme(el){
-  const th=getTheme(el);
-  S.theme=th;
-  const r=document.documentElement;
-  r.style.setProperty('--el',th.c);
-  r.style.setProperty('--el-glow',th.g);
-  r.style.setProperty('--el-bg',th.bg);
-  document.body.style.background=th.bg;
-  glow.style.boxShadow=`0 0 40px ${th.c}55, 0 0 80px ${th.c}22`;
-  glow.style.background=`radial-gradient(circle, ${th.c}14 0%, transparent 68%)`;
-}
-
-function resetTheme(){
-  const r=document.documentElement;
-  ['--el','--el-glow','--el-bg'].forEach(v=>r.style.removeProperty(v));
-  document.body.style.background='';
-  glow.style.boxShadow=''; glow.style.background='';
-}
-
-// ═══════════════════════════════════════════════════════
-//  CONTROLS
-// ═══════════════════════════════════════════════════════
-document.getElementById('btn-pen').addEventListener('click',()=>{
-  S.tool='pen';
-  document.getElementById('btn-pen').classList.add('active');
-  document.getElementById('btn-erase').classList.remove('active');
-  drC.style.cursor='crosshair';
-});
-
-document.getElementById('btn-erase').addEventListener('click',()=>{
-  S.tool='eraser';
-  document.getElementById('btn-erase').classList.add('active');
-  document.getElementById('btn-pen').classList.remove('active');
-  drC.style.cursor='cell';
-});
-
-document.getElementById('btn-clear').addEventListener('click',()=>{
-  S.strokes=[]; S.cur=null; S.hasDrawn=false; S.loading=false;
-  S.particles=[];
-  if(S.fxRafId){cancelAnimationFrame(S.fxRafId);S.fxRafId=null;}
-  drX.clearRect(0,0,S.size,S.size);
-  fxX.clearRect(0,0,S.size,S.size);
-  document.getElementById('btn-cast').disabled=true;
-  setState('empty');
-  resetTheme();
-});
-
-document.getElementById('btn-cast').addEventListener('click',divineSpell);
-
-// ── Fullscreen ──
-const fsBtn=document.getElementById('fs-btn');
-const fsExpand=document.getElementById('fs-icon-expand');
-const fsExit=document.getElementById('fs-icon-exit');
-
-fsBtn.addEventListener('click',()=>{
-  const el=document.documentElement;
-  const inFs=!!(document.fullscreenElement||document.webkitFullscreenElement);
-  if(!inFs){
-    (el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen||el.msRequestFullscreen||function(){}).call(el);
-  } else {
-    (document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen||document.msExitFullscreen||function(){}).call(document);
-  }
-});
-
-['fullscreenchange','webkitfullscreenchange','mozfullscreenchange'].forEach(ev=>{
-  document.addEventListener(ev,()=>{
-    const inFs=!!(document.fullscreenElement||document.webkitFullscreenElement);
-    fsExpand.style.display=inFs?'none':'block';
-    fsExit.style.display=inFs?'block':'none';
-    setTimeout(resizeAll,120);
-  });
-});
-
-// ── Prevent default browser touch handling ──
-document.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
-document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
-
-// ── Resize ──
-const ro=new ResizeObserver(()=>resizeAll());
-ro.observe(document.getElementById('canvas-area'));
-window.addEventListener('orientationchange',()=>setTimeout(resizeAll,250));
-
-// ── Init ──
-resizeAll();
-setState('empty');
-</script>
-</body>
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">  
+<meta name="apple-mobile-web-app-capable" content="yes">  
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">  
+<meta name="apple-mobile-web-app-title" content="Spell Diviner">  
+<title>Witch Hat — Spell Circle Diviner</title>  
+<style>  
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}  
+:root{  
+  --gold:#c9a84c;--gold-light:#f0d080;--gold-dim:#7a5e28;  
+  --bg:#06060f;--surface:#0c0c1b;--border:rgba(201,168,76,0.22);  
+  --text:#c4b07a;--text-dim:#5a4e34;  
+  --el:#c9a84c;--el-glow:#f0d080;--el-bg:#06060f;  
+  --font:'Palatino Linotype','Book Antiqua',Palatino,serif;  
+}  
+html,body{width:100%;height:100%;overflow:hidden;background:var(--el-bg);font-family:var(--font);touch-action:none;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;transition:background 1.2s ease}  
+  
+/* ── Layout ── */  
+#app{position:fixed;inset:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);display:grid;grid-template-rows:auto 1fr auto;grid-template-columns:1fr;overflow:hidden}  
+@media(min-width:860px) and (orientation:landscape){  
+  #app{grid-template-rows:auto 1fr;grid-template-columns:1fr 360px}  
+  #hdr{grid-column:1/-1}  
+  #canvas-area{grid-column:1;grid-row:2}  
+  #sidebar{grid-column:2;grid-row:2}  
+  #toolbar{grid-row:unset;position:absolute;bottom:1.2rem;left:calc(50% - 180px);transform:none;width:auto;border:none;background:rgba(6,6,15,0.85);border-radius:8px;padding:0.6rem 1rem;backdrop-filter:blur(16px)}  
+}  
+  
+/* ── Header ── */  
+#hdr{display:flex;align-items:center;justify-content:space-between;padding:0.65rem 1.1rem;border-bottom:1px solid var(--border);background:rgba(6,6,15,0.88);backdrop-filter:blur(12px);z-index:20;transition:border-color 1s}  
+.hdr-sub{font-size:0.58rem;letter-spacing:0.32em;text-transform:uppercase;color:var(--el);transition:color 1s}  
+.hdr-title{font-size:1rem;color:var(--el-glow);letter-spacing:0.08em;text-shadow:0 0 18px var(--el);transition:all 1s;font-weight:400}  
+.hdr-btns{display:flex;gap:0.45rem}  
+.icon-btn{width:34px;height:34px;border:1px solid var(--border);background:transparent;color:var(--el);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;-webkit-tap-highlight-color:transparent}  
+.icon-btn:active{transform:scale(0.93);background:rgba(201,168,76,0.12)}  
+.pencil-indicator{font-size:0.6rem;letter-spacing:0.08em;color:var(--text-dim);padding:0.2rem 0.5rem;border:1px solid var(--border);border-radius:3px;display:none;align-items:center;gap:0.3rem}  
+.pencil-indicator.visible{display:flex}  
+.pencil-dot{width:6px;height:6px;border-radius:50%;background:var(--el);box-shadow:0 0 6px var(--el);animation:pulse 1.5s ease infinite}  
+  
+/* ── Canvas Area ── */  
+#canvas-area{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;gap:0}  
+#canvas-wrap{position:relative;border-radius:50%;flex-shrink:0}  
+#bg-canvas,#draw-canvas,#fx-canvas{position:absolute;top:0;left:0;border-radius:50%}  
+#bg-canvas{z-index:1;pointer-events:none}  
+#fx-canvas{z-index:3;pointer-events:none}  
+#draw-canvas{z-index:2;touch-action:none;cursor:crosshair}  
+#ring-glow{position:absolute;inset:-16px;border-radius:50%;pointer-events:none;z-index:0;transition:box-shadow 1.2s,background 1.2s;box-shadow:0 0 24px rgba(201,168,76,0.12)}  
+  
+/* ── Toolbar ── */  
+#toolbar{display:flex;align-items:center;justify-content:center;gap:0.45rem;padding:0.7rem 1rem;border-top:1px solid var(--border);background:rgba(6,6,15,0.92);backdrop-filter:blur(12px);z-index:20;flex-wrap:wrap}  
+.tool-btn{padding:0.42rem 0.9rem;border:1px solid var(--border);background:transparent;color:var(--el);font-family:var(--font);font-size:0.75rem;letter-spacing:0.07em;border-radius:3px;cursor:pointer;transition:all 0.2s;-webkit-tap-highlight-color:transparent}  
+.tool-btn:active,.tool-btn.active{background:var(--el);color:var(--bg);border-color:var(--el)}  
+.cast-btn{padding:0.5rem 1.6rem;border:1px solid var(--el);background:linear-gradient(135deg,rgba(201,168,76,0.15),rgba(240,208,128,0.25));color:var(--el-glow);font-family:var(--font);font-size:0.85rem;letter-spacing:0.12em;border-radius:3px;cursor:pointer;transition:all 0.3s;box-shadow:0 0 14px rgba(201,168,76,0.15);-webkit-tap-highlight-color:transparent}  
+.cast-btn:disabled{opacity:0.3;cursor:default;box-shadow:none;border-color:var(--border);color:var(--text-dim);background:transparent}  
+.cast-btn:not(:disabled):active{transform:scale(0.97)}  
+  
+/* ── Sidebar ── */  
+#sidebar{background:var(--surface);border-left:1px solid var(--border);overflow-y:auto;overflow-x:hidden;padding:1.25rem 1.1rem;display:flex;flex-direction:column;gap:1rem;transition:border-color 1s,background 1.2s;scrollbar-width:thin;scrollbar-color:var(--border) transparent}  
+#sidebar::-webkit-scrollbar{width:3px}  
+#sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}  
+@media(max-width:859px),(orientation:portrait){  
+  #sidebar{border-left:none;border-top:1px solid var(--border);max-height:42vh;min-height:140px}  
+}  
+  
+/* ── Empty / Loading ── */  
+.state-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.8rem;padding:1.5rem 0}  
+.state-text{font-size:0.78rem;color:var(--gold);text-align:center;line-height:1.7;letter-spacing:0.06em;opacity:0.45}  
+.spin{animation:spin 3s linear infinite}  
+.spin-rev{animation:spin 2s linear infinite reverse;transform-origin:center}  
+@keyframes spin{to{transform:rotate(360deg)}}  
+@keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}  
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}  
+  
+/* ── Accuracy ── */  
+.section-label{font-size:0.57rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--el);border-bottom:1px solid var(--border);padding-bottom:0.35rem;margin-bottom:0.1rem;transition:color 1s,border-color 1s}  
+.grade-box{border:1px solid var(--border);border-radius:5px;padding:0.65rem 0.9rem;text-align:center;transition:border-color 1s;background:rgba(201,168,76,0.04)}  
+.grade-label{font-size:0.95rem;color:var(--el-glow);letter-spacing:0.06em;transition:color 1s}  
+.grade-desc{font-size:0.68rem;color:var(--text-dim);margin-top:0.3rem;line-height:1.5;font-style:italic}  
+.score-row{display:flex;align-items:center;gap:0.65rem;margin-top:0.45rem}  
+.score-lbl{font-size:0.67rem;color:var(--text-dim);letter-spacing:0.04em;width:105px;flex-shrink:0}  
+.score-bar{flex:1;height:3px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden}  
+.score-fill{height:100%;border-radius:2px;transition:width 1.3s cubic-bezier(0.4,0,0.2,1);background:linear-gradient(to right,var(--gold-dim),var(--el))}  
+.score-num{font-size:0.7rem;color:var(--el);width:28px;text-align:right}  
+#bar-potency .score-fill{background:linear-gradient(to right,var(--gold-dim),var(--el),var(--el-glow))}  
+  
+/* ── Spell Result ── */  
+.spell-tags{display:flex;gap:0.35rem;flex-wrap:wrap}  
+.spell-tag{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--el);border:1px solid currentColor;border-radius:2px;padding:0.12rem 0.45rem;transition:color 1s}  
+.spell-name{font-size:1.4rem;color:var(--el-glow);letter-spacing:0.05em;font-weight:400;line-height:1.2;text-shadow:0 0 18px var(--el);transition:color 1s,text-shadow 1s}  
+.divider{height:1px;background:linear-gradient(to right,var(--el) 30%,transparent);margin:0.1rem 0;transition:background 1s}  
+.spell-desc{font-size:0.82rem;line-height:1.75;color:var(--text);font-style:italic}  
+.spell-components{font-size:0.68rem;line-height:1.55;color:var(--text-dim);border-top:1px solid var(--border);padding-top:0.65rem;margin-top:0.1rem}  
+.spell-lore{font-size:0.68rem;line-height:1.6;color:var(--text-dim);border-top:1px solid var(--border);padding-top:0.65rem;font-style:italic}  
+.reveal{animation:fadeUp 0.6s ease both}  
+.pressure-bar-wrap{display:flex;align-items:center;gap:0.5rem;margin-top:0.3rem}  
+.pressure-label{font-size:0.6rem;color:var(--text-dim);letter-spacing:0.05em}  
+.pressure-bar{flex:1;height:2px;background:rgba(255,255,255,0.05);border-radius:1px}  
+.pressure-fill{height:100%;border-radius:1px;background:var(--el);transition:width 0.1s}  
+</style>  
+</head>  
+<body>  
+<div id="app">  
+  
+<header id="hdr">  
+  <div>  
+    <div class="hdr-sub">Witch Hat Atelier</div>  
+    <div class="hdr-title">Spell Circle Diviner</div>  
+  </div>  
+  <div class="hdr-btns">  
+    <div class="pencil-indicator" id="pencil-ind">  
+      <div class="pencil-dot"></div>✏︎ Pencil  
+    </div>  
+    <button class="icon-btn" id="fs-btn" title="Fullscreen">  
+      <svg id="fs-icon-expand" width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.6">  
+        <path d="M1 1h4M1 1v4M14 1h-4M14 1v4M1 14h4M1 14v-4M14 14h-4M14 14v-4"/>  
+      </svg>  
+      <svg id="fs-icon-exit" width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.6" style="display:none">  
+        <path d="M5 1v4H1M10 1v4h4M5 14v-4H1M10 14v-4h4"/>  
+      </svg>  
+    </button>  
+  </div>  
+</header>  
+  
+<div id="canvas-area">  
+  <div id="canvas-wrap">  
+    <div id="ring-glow"></div>  
+    <canvas id="bg-canvas"></canvas>  
+    <canvas id="draw-canvas"></canvas>  
+    <canvas id="fx-canvas"></canvas>  
+  </div>  
+</div>  
+  
+<div id="sidebar">  
+  <div class="state-center" id="state-empty">  
+    <svg width="54" height="54" viewBox="0 0 54 54" opacity="0.45">  
+      <circle cx="27" cy="27" r="23" fill="none" stroke="#c9a84c" stroke-width="1" stroke-dasharray="4.5 3.5"/>  
+      <circle cx="27" cy="27" r="13" fill="none" stroke="#c9a84c" stroke-width="0.7" stroke-dasharray="3 3" opacity="0.6"/>  
+      <circle cx="27" cy="27" r="3" fill="#c9a84c" opacity="0.7"/>  
+      <line x1="27" y1="14" x2="27" y2="11" stroke="#c9a84c" stroke-width="1.5"/>  
+      <line x1="27" y1="40" x2="27" y2="43" stroke="#c9a84c" stroke-width="1.5"/>  
+      <line x1="14" y1="27" x2="11" y2="27" stroke="#c9a84c" stroke-width="1.5"/>  
+      <line x1="40" y1="27" x2="43" y2="27" stroke="#c9a84c" stroke-width="1.5"/>  
+    </svg>  
+    <div class="state-text">Draw your glyph within the circle<br>then divine its power</div>  
+  </div>  
+  
+  <div class="state-center" id="state-loading" style="display:none">  
+    <svg width="50" height="50" viewBox="0 0 50 50" class="spin">  
+      <circle cx="25" cy="25" r="21" fill="none" stroke="#c9a84c" stroke-width="1" stroke-dasharray="7 5" opacity="0.55"/>  
+      <circle cx="25" cy="25" r="13" fill="none" stroke="#f0d080" stroke-width="0.8" stroke-dasharray="4 4" opacity="0.4" class="spin-rev"/>  
+      <circle cx="25" cy="25" r="3" fill="#c9a84c"/>  
+    </svg>  
+    <div class="state-text" style="opacity:1;animation:pulse 1.8s ease infinite">Consulting the Great Library…</div>  
+  </div>  
+  
+  <div id="state-result" style="display:none" class="reveal">  
+    <div class="section-label">Inscription Quality</div>  
+    <div class="grade-box">  
+      <div class="grade-label" id="r-grade">—</div>  
+      <div class="grade-desc" id="r-grade-desc">—</div>  
+    </div>  
+    <div id="score-rows">  
+      <div class="score-row">  
+        <div class="score-lbl">Stroke Purity</div>  
+        <div class="score-bar"><div class="score-fill" id="b-smooth" style="width:0%"></div></div>  
+        <div class="score-num" id="n-smooth">—</div>  
+      </div>  
+      <div class="score-row">  
+        <div class="score-lbl">Seal Balance</div>  
+        <div class="score-bar"><div class="score-fill" id="b-balance" style="width:0%"></div></div>  
+        <div class="score-num" id="n-balance">—</div>  
+      </div>  
+      <div class="score-row">  
+        <div class="score-lbl">Line Confidence</div>  
+        <div class="score-bar"><div class="score-fill" id="b-conf" style="width:0%"></div></div>  
+        <div class="score-num" id="n-conf">—</div>  
+      </div>  
+      <div class="score-row" id="row-potency">  
+        <div class="score-lbl">Spell Potency</div>  
+        <div class="score-bar" id="bar-potency"><div class="score-fill" id="b-potency" style="width:0%"></div></div>  
+        <div class="score-num" id="n-potency">—</div>  
+      </div>  
+    </div>  
+  
+    <div class="section-label" style="margin-top:0.3rem">Spell Identification</div>  
+    <div class="spell-tags" id="r-tags"></div>  
+    <div class="spell-name" id="r-name">—</div>  
+    <div class="divider"></div>  
+    <div class="spell-desc" id="r-desc">—</div>  
+    <div class="spell-components" id="r-components">—</div>  
+    <div class="spell-lore" id="r-lore"></div>  
+  </div>  
+</div>  
+  
+<div id="toolbar">  
+  <button class="tool-btn active" id="btn-pen">✒ Quill</button>  
+  <button class="tool-btn" id="btn-erase">◻ Erase</button>  
+  <button class="tool-btn" id="btn-clear">↺ Clear</button>  
+  <div class="pressure-bar-wrap" id="pressure-wrap" style="display:none">  
+    <div class="pressure-label">Pressure</div>  
+    <div class="pressure-bar"><div class="pressure-fill" id="pressure-fill" style="width:0%"></div></div>  
+  </div>  
+  <button class="cast-btn" id="btn-cast" disabled>✦ Divine the Spell</button>  
+</div>  
+</div><script>  
+// ═══════════════════════════════════════════════════════  
+//  CONSTANTS & THEMES  
+// ═══════════════════════════════════════════════════════  
+const THEMES = {  
+  Fire:  {c:'#ff6a3d',g:'#ffaa60',bg:'#130400',pc:['#ff6a3d','#ff9f1c','#ffcc02','rgba(255,200,100,0.6)']},  
+  Water: {c:'#3dbdff',g:'#90e8ff',bg:'#000f1c',pc:['#00b4d8','#90e0ef','#caf0f8','rgba(150,230,255,0.5)']},  
+  Earth: {c:'#c8a060',g:'#e8c890',bg:'#0f0700',pc:['#8b5e3c','#a07850','#6b8f47','#c8a87a']},  
+  Wind:  {c:'#a8ffcc',g:'#d0ffe8',bg:'#001a0a',pc:['#a8ffd0','#d0ffe8','rgba(200,255,220,0.5)','#fff']},  
+  Light: {c:'#fff8c0',g:'#ffffff', bg:'#141200',pc:['#fff','rgba(255,253,230,0.9)','rgba(255,245,150,0.7)','rgba(240,220,80,0.5)']},  
+  Arcane:{c:'#cc60ff',g:'#f0a0ff',bg:'#090014',pc:['#9c27b0','#ce93d8','#e040fb','rgba(200,100,255,0.5)']},  
+};  
+function getTheme(el){  
+  if(!el) return THEMES.Arcane;  
+  const k = Object.keys(THEMES).find(k=>el.toLowerCase().includes(k.toLowerCase()));  
+  return THEMES[k]||THEMES.Arcane;  
+}  
+  
+// ═══════════════════════════════════════════════════════  
+//  STATE  
+// ═══════════════════════════════════════════════════════  
+const S = {  
+  tool:'pen',  
+  strokes:[],         // [{pts:[{x,y,p}...], eraser:bool}]  
+  cur:null,           // current stroke being drawn  
+  hasDrawn:false,  
+  loading:false,  
+  size:400,           // canvas CSS size (square)  
+  dpr:1,  
+  particles:[],  
+  fxRafId:null,  
+  theme:null,  
+  lastPressure:0.5,  
+};  
+  
+// ═══════════════════════════════════════════════════════  
+//  CANVAS SETUP  
+// ═══════════════════════════════════════════════════════  
+const bgC  = document.getElementById('bg-canvas');  
+const drC  = document.getElementById('draw-canvas');  
+const fxC  = document.getElementById('fx-canvas');  
+const bgX  = bgC.getContext('2d');  
+const drX  = drC.getContext('2d');  
+const fxX  = fxC.getContext('2d');  
+const wrap = document.getElementById('canvas-wrap');  
+const glow = document.getElementById('ring-glow');  
+  
+function resizeAll(){  
+  const area = document.getElementById('canvas-area');  
+  const r = area.getBoundingClientRect();  
+  const pad = 24;  
+  // In landscape with sidebar, the canvas-area is the left portion  
+  const maxW = r.width  - pad*2;  
+  const maxH = r.height - pad*2;  
+  const sz = Math.max(240, Math.min(maxW, maxH, 680));  
+  S.size = sz;  
+  S.dpr  = Math.min(window.devicePixelRatio||1, 3);  
+  
+  wrap.style.width  = sz+'px';  
+  wrap.style.height = sz+'px';  
+  
+  [bgC,drC,fxC].forEach(c=>{  
+    c.width  = sz*S.dpr;  
+    c.height = sz*S.dpr;  
+    c.style.width  = sz+'px';  
+    c.style.height = sz+'px';  
+  });  
+  
+  // Rescale contexts  
+  bgX.setTransform(1,0,0,1,0,0); bgX.scale(S.dpr,S.dpr);  
+  drX.setTransform(1,0,0,1,0,0); drX.scale(S.dpr,S.dpr);  
+  fxX.setTransform(1,0,0,1,0,0); fxX.scale(S.dpr,S.dpr);  
+  
+  drawBg();  
+  redrawStrokes();  
+}  
+  
+function drawBg(){  
+  const s=S.size, cx=s/2, cy=s/2, r=s/2-14;  
+  bgX.clearRect(0,0,s,s);  
+  bgX.fillStyle='#06060f';  
+  bgX.fillRect(0,0,s,s);  
+  
+  // Outer ring  
+  bgX.shadowColor='rgba(240,208,128,0.4)';  
+  bgX.shadowBlur=10;  
+  bgX.strokeStyle='rgba(201,168,76,0.75)';  
+  bgX.lineWidth=2;  
+  bgX.beginPath(); bgX.arc(cx,cy,r,0,Math.PI*2); bgX.stroke();  
+  bgX.shadowBlur=0;  
+  
+  // Cardinal tick marks  
+  for(let i=0;i<8;i++){  
+    const a=(i*Math.PI/4)-Math.PI/2;  
+    const major=i%2===0;  
+    const len=major?15:9;  
+    bgX.beginPath();  
+    bgX.moveTo(cx+(r-2)*Math.cos(a), cy+(r-2)*Math.sin(a));  
+    bgX.lineTo(cx+(r-len)*Math.cos(a), cy+(r-len)*Math.sin(a));  
+    bgX.strokeStyle=`rgba(201,168,76,${major?0.85:0.45})`;  
+    bgX.lineWidth=major?2:1.5;  
+    bgX.stroke();  
+  }  
+  
+  // Small ring of rune-like dots  
+  for(let i=0;i<32;i++){  
+    if(i%4===0) continue;  
+    const a=(i/32)*Math.PI*2-Math.PI/2;  
+    const rx=cx+(r+9)*Math.cos(a), ry=cy+(r+9)*Math.sin(a);  
+    if(rx>2&&rx<s-2&&ry>2&&ry<s-2){  
+      bgX.beginPath(); bgX.arc(rx,ry,0.9,0,Math.PI*2);  
+      bgX.fillStyle='rgba(201,168,76,0.3)'; bgX.fill();  
+    }  
+  }  
+  
+  // Inner guide ring (very faint)  
+  bgX.strokeStyle='rgba(201,168,76,0.08)';  
+  bgX.lineWidth=1;  
+  bgX.setLineDash([3,6]);  
+  bgX.beginPath(); bgX.arc(cx,cy,r*0.55,0,Math.PI*2); bgX.stroke();  
+  bgX.setLineDash([]);  
+  
+  // Center crosshair (very faint)  
+  bgX.strokeStyle='rgba(201,168,76,0.1)';  
+  bgX.lineWidth=0.8;  
+  bgX.beginPath(); bgX.moveTo(cx-12,cy); bgX.lineTo(cx+12,cy); bgX.stroke();  
+  bgX.beginPath(); bgX.moveTo(cx,cy-12); bgX.lineTo(cx,cy+12); bgX.stroke();  
+}  
+  
+function redrawStrokes(){  
+  drX.clearRect(0,0,S.size,S.size);  
+  S.strokes.forEach(renderStroke);  
+}  
+  
+// ═══════════════════════════════════════════════════════  
+//  DRAWING  
+// ═══════════════════════════════════════════════════════  
+function renderStroke(stroke){  
+  const pts=stroke.pts;  
+  if(pts.length<2) return;  
+  drX.lineCap='round'; drX.lineJoin='round';  
+  for(let i=1;i<pts.length;i++){  
+    const p0=pts[i-1], p1=pts[i];  
+    const lw=stroke.eraser?26:(1.2+(p1.p||0.5)*2.8);  
+    drX.beginPath();  
+    drX.moveTo(p0.x*S.size, p0.y*S.size);  
+    drX.lineTo(p1.x*S.size, p1.y*S.size);  
+    if(stroke.eraser){  
+      drX.globalCompositeOperation='destination-out';  
+      drX.strokeStyle='rgba(0,0,0,1)';  
+      drX.lineWidth=lw;  
+      drX.stroke();  
+      drX.globalCompositeOperation='source-over';  
+    } else {  
+      drX.shadowColor='rgba(240,208,128,0.55)';  
+      drX.shadowBlur=5;  
+      drX.strokeStyle='rgba(201,168,76,0.92)';  
+      drX.lineWidth=lw;  
+      drX.stroke();  
+      drX.shadowBlur=0;  
+    }  
+  }  
+}  
+  
+function renderSegment(p0,p1,eraser,pressure){  
+  if(!p0||!p1) return;  
+  const lw=eraser?26:(1.2+(pressure||0.5)*2.8);  
+  drX.lineCap='round'; drX.lineJoin='round';  
+  drX.beginPath();  
+  drX.moveTo(p0.x*S.size, p0.y*S.size);  
+  drX.lineTo(p1.x*S.size, p1.y*S.size);  
+  if(eraser){  
+    drX.globalCompositeOperation='destination-out';  
+    drX.strokeStyle='rgba(0,0,0,1)';  
+    drX.lineWidth=lw; drX.stroke();  
+    drX.globalCompositeOperation='source-over';  
+  } else {  
+    drX.shadowColor='rgba(240,208,128,0.55)';  
+    drX.shadowBlur=5;  
+    drX.strokeStyle='rgba(201,168,76,0.92)';  
+    drX.lineWidth=lw; drX.stroke();  
+    drX.shadowBlur=0;  
+  }  
+}  
+  
+// ═══════════════════════════════════════════════════════  
+//  POINTER EVENTS (mouse / touch / Apple Pencil)  
+// ═══════════════════════════════════════════════════════  
+let prevPt=null;  
+  
+drC.addEventListener('pointerdown',e=>{  
+  e.preventDefault();  
+  drC.setPointerCapture(e.pointerId);  
+  const pos=norm(e);  
+  S.cur={pts:[{...pos,p:e.pressure||0.5}], eraser:S.tool==='eraser'};  
+  prevPt=pos;  
+  showPressure(e);  
+  if(e.pointerType==='pen') document.getElementById('pencil-ind').classList.add('visible');  
+},{passive:false});  
+  
+drC.addEventListener('pointermove',e=>{  
+  e.preventDefault();  
+  showPressure(e);  
+  if(!S.cur) return;  
+  const pos=norm(e);  
+  // Minimum distance filter  
+  if(prevPt && Math.hypot((pos.x-prevPt.x)*S.size,(pos.y-prevPt.y)*S.size)<0.8) return;  
+  const pt={...pos,p:e.pressure||0.5};  
+  renderSegment(prevPt?{...prevPt}:null, pos, S.cur.eraser, pt.p);  
+  S.cur.pts.push(pt);  
+  prevPt=pos;  
+  if(!S.hasDrawn && !S.cur.eraser){  
+    S.hasDrawn=true;  
+    document.getElementById('btn-cast').disabled=false;  
+  }  
+},{passive:false});  
+  
+drC.addEventListener('pointerup',e=>{  
+  e.preventDefault();  
+  hidePressure();  
+  if(!S.cur) return;  
+  if(S.cur.pts.length>1) S.strokes.push(S.cur);  
+  S.cur=null; prevPt=null;  
+  if(S.tool==='eraser') redrawStrokes();  
+},{passive:false});  
+  
+drC.addEventListener('pointercancel',e=>{  
+  if(S.cur){S.strokes.push(S.cur); S.cur=null;}  
+  prevPt=null; hidePressure();  
+});  
+  
+function norm(e){  
+  const r=drC.getBoundingClientRect();  
+  return {x:(e.clientX-r.left)/r.width, y:(e.clientY-r.top)/r.height};  
+}  
+  
+function showPressure(e){  
+  if(e.pointerType==='pen'){  
+    const pf=document.getElementById('pressure-fill');  
+    const pw=document.getElementById('pressure-wrap');  
+    pw.style.display='flex';  
+    pf.style.width=(e.pressure*100)+'%';  
+  }  
+}  
+function hidePressure(){  
+  // Keep visible if pencil was used  
+}  
+  
+// ═══════════════════════════════════════════════════════  
+//  ACCURACY ANALYSIS  
+// ═══════════════════════════════════════════════════════  
+function analyzeAccuracy(){  
+  const ink=S.strokes.filter(s=>!s.eraser && s.pts.length>1);  
+  if(ink.length===0) return null;  
+  
+  const all=ink.flatMap(s=>s.pts);  
+  
+  // 1. STROKE PURITY — penalize angular jitter (squiggly lines)  
+  let jitterSum=0, jitterN=0;  
+  for(const stroke of ink){  
+    const pts=stroke.pts;  
+    for(let i=1;i<pts.length-1;i++){  
+      const p1=pts[i-1],p2=pts[i],p3=pts[i+1];  
+      const dx1=(p2.x-p1.x)*S.size, dy1=(p2.y-p1.y)*S.size;  
+      const dx2=(p3.x-p2.x)*S.size, dy2=(p3.y-p2.y)*S.size;  
+      const l1=Math.hypot(dx1,dy1), l2=Math.hypot(dx2,dy2);  
+      if(l1<0.4||l2<0.4) continue;  
+      const dot=(dx1*dx2+dy1*dy2)/(l1*l2);  
+      jitterSum+=Math.acos(Math.max(-1,Math.min(1,dot)));  
+      jitterN++;  
+    }  
+  }  
+  const avgJ=jitterN>0?jitterSum/jitterN:0;  
+  // Scale: 0 rad=100, 0.5 rad=0 (0.5rad≈28.6° average change is very squiggly)  
+  const strokePurity=Math.round(Math.max(0,Math.min(100,(1-avgJ/0.55)*100)));  
+  
+  // 2. SEAL BALANCE — check distribution across 8 sectors of the circle interior  
+  const cx=all.reduce((s,p)=>s+p.x,0)/all.length;  
+  const cy=all.reduce((s,p)=>s+p.y,0)/all.length;  
+  const sectors=new Array(8).fill(0);  
+  for(const p of all){  
+    const a=Math.atan2(p.y-cy,p.x-cx);  
+    const idx=Math.floor(((a+Math.PI)/(Math.PI*2))*8)%8;  
+    sectors[idx]++;  
+  }  
+  const mean=sectors.reduce((a,b)=>a+b,0)/8;  
+  const variance=sectors.reduce((s,v)=>s+(v-mean)**2,0)/8;  
+  const cv=mean>0?Math.sqrt(variance)/mean:1;  
+  // cv=0 means perfectly balanced, cv=1+ means very unbalanced  
+  const sealBalance=Math.round(Math.max(0,Math.min(100,(1-Math.min(cv,1.4)/1.4)*100)));  
+  
+  // 3. LINE CONFIDENCE — average segment length (longer decisive strokes = higher score)  
+  let totalLen=0, totalSegs=0;  
+  for(const stroke of ink){  
+    const pts=stroke.pts;  
+    for(let i=1;i<pts.length;i++){  
+      const dx=(pts[i].x-pts[i-1].x)*S.size, dy=(pts[i].y-pts[i-1].y)*S.size;  
+      totalLen+=Math.hypot(dx,dy);  
+      totalSegs++;  
+    }  
+  }  
+  const avgSegLen=totalSegs>0?totalLen/totalSegs:0;  
+  // Short choppy strokes (<3px avg) = 0, long decisive strokes (>15px avg) = 100  
+  const lineConf=Math.round(Math.max(0,Math.min(100,(avgSegLen-0.5)/18*100)));  
+  
+  // POTENCY — weighted combination  
+  const potency=Math.round(0.38*strokePurity + 0.32*sealBalance + 0.30*lineConf);  
+  
+  return {strokePurity,sealBalance,lineConf,potency,grade:grade(potency)};  
+}  
+  
+function grade(p){  
+  if(p>=90) return{l:'Master Sigil',d:'A transcendent inscription. Your precision rivals the Three Wise themselves.'};  
+  if(p>=74) return{l:'Expert Seal',d:'Practiced and confident. Worthy of a senior apprentice.'};  
+  if(p>=54) return{l:'Journeyman Mark',d:'Functional, though imperfections may shorten the spell\'s duration.'};  
+  if(p>=34) return{l:'Apprentice Scratch',d:'Rough and trembling. The spell may misfire or weaken unpredictably.'};  
+  return      {l:'Unformed Scrawl',d:'The conjuring ink barely recognizes this shape. Begin anew with a steadier hand.'};  
+}  
+  
+// ═══════════════════════════════════════════════════════  
+//  PARTICLE SYSTEM  
+// ═══════════════════════════════════════════════════════  
+class P{  
+  constructor(x,y,el){  
+    const th=getTheme(el);  
+    this.x=x; this.y=y;  
+    this.el=el||'Arcane';  
+    this.col=th.pc[Math.floor(Math.random()*th.pc.length)];  
+    const spd=1.5+Math.random()*4.5;  
+    const ang=Math.random()*Math.PI*2;  
+    this.vx=Math.cos(ang)*spd; this.vy=Math.sin(ang)*spd;  
+    this.life=0; this.maxL=50+Math.random()*90;  
+    this.sz=1.5+Math.random()*4; this.rot=Math.random()*Math.PI*2;  
+    this.rotSpd=(Math.random()-0.5)*0.25;  
+  }  
+  tick(){  
+    this.life++;  
+    const el=this.el.toLowerCase();  
+    if(el.includes('fire')){  
+      this.vy-=0.07; this.vx+=(Math.random()-0.5)*0.18; this.sz*=0.988;  
+    } else if(el.includes('water')){  
+      this.vy+=0.055; this.vx*=0.97; this.vx+=Math.sin(this.life*0.14)*0.12;  
+    } else if(el.includes('wind')){  
+      const ang=Math.atan2(this.vy,this.vx)+0.055;  
+      const spd=Math.hypot(this.vx,this.vy)*0.985;  
+      this.vx=Math.cos(ang)*spd; this.vy=Math.sin(ang)*spd;  
+    } else if(el.includes('earth')){  
+      this.vy+=0.13; this.vx*=0.97;  
+    } else if(el.includes('light')){  
+      this.vx*=0.93; this.vy*=0.93; this.sz*=0.96;  
+    } else {  
+      const ang=Math.atan2(this.vy,this.vx)+0.045;  
+      const spd=Math.hypot(this.vx,this.vy)*0.978;  
+      this.vx=Math.cos(ang)*spd; this.vy=Math.sin(ang)*spd;  
+    }  
+    this.x+=this.vx; this.y+=this.vy; this.rot+=this.rotSpd;  
+    return this.life<this.maxL;  
+  }  
+  draw(ctx){  
+    const t=this.life/this.maxL;  
+    const alpha=Math.sin(t*Math.PI)*0.85;  
+    ctx.save();  
+    ctx.globalAlpha=alpha;  
+    ctx.translate(this.x,this.y); ctx.rotate(this.rot);  
+    ctx.fillStyle=this.col; ctx.shadowColor=this.col; ctx.shadowBlur=this.sz*2.5;  
+    ctx.beginPath();  
+    if(this.el.toLowerCase().includes('light')){  
+      // Star shape for light  
+      const r=this.sz*(1-t*0.4), r2=r*0.4;  
+      ctx.moveTo(0,-r);  
+      for(let i=1;i<8;i++){  
+        const a=(i*Math.PI/4)-(Math.PI/2);  
+        const rr=i%2===0?r:r2;  
+        ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr);  
+      }  
+      ctx.closePath();  
+    } else {  
+      ctx.arc(0,0,this.sz*(1-t*0.5),0,Math.PI*2);  
+    }  
+    ctx.fill();  
+    ctx.restore();  
+  }  
+}  
+  
+function spawnParticles(el){  
+  const s=S.size, cx=s/2, cy=s/2;  
+  const n=el.toLowerCase().includes('light')?100:60;  
+  for(let i=0;i<n;i++){  
+    const fromRing=Math.random()>0.35;  
+    let x,y;  
+    if(fromRing){  
+      const r=s/2-14, a=Math.random()*Math.PI*2;  
+      x=cx+r*Math.cos(a); y=cy+r*Math.sin(a);  
+    } else {  
+      x=cx+(Math.random()-0.5)*80; y=cy+(Math.random()-0.5)*80;  
+    }  
+    S.particles.push(new P(x,y,el));  
+  }  
+  if(!S.fxRafId) fxLoop();  
+}  
+  
+function fxLoop(){  
+  const s=S.size;  
+  fxX.clearRect(0,0,s,s);  
+  S.particles=S.particles.filter(p=>p.tick());  
+  S.particles.forEach(p=>p.draw(fxX));  
+  if(S.particles.length>0) S.fxRafId=requestAnimationFrame(fxLoop);  
+  else{ S.fxRafId=null; fxX.clearRect(0,0,s,s); }  
+}  
+  
+// ═══════════════════════════════════════════════════════  
+//  WHA SYSTEM PROMPT & API CALL  
+// ═══════════════════════════════════════════════════════  
+const WHA_PROMPT=`You are a master glyph scholar in the world of Witch Hat Atelier (Tongari Boushi no Atorie) by Kamome Shirahama. Identify spell glyphs drawn on spell circles with expert precision.  
+  
+═══ THE WITCH HAT ATELIER MAGIC SYSTEM ═══  
+  
+CORE PRINCIPLE: Magic is performed entirely through drawing glyphs with special conjuring ink made from the Silverwood Tree. Skill in drawing — not innate talent — determines power. Anyone who learns to draw correctly can wield magic.  
+  
+A GLYPH'S THREE COMPONENTS:  
+1. SIGIL (center of glyph) — defines the element:  
+   • FIRE sigil — heat, combustion, flame projection, explosive force, also produces light via heat  
+   • WATER sigil — liquid manipulation, pressure, flow, mist, wave generation, freezing water    
+   • EARTH sigil — stone, soil, sand, dust, crystal, solid matter; manipulation and destruction  
+   • WIND sigil (also called Air) — air currents, propulsion, levitation, breath, pressure waves  
+   • LIGHT sigil — illumination, vision magic, revelation, reflection, blinding, bending of light  
+   • CRYSTAL sigil (Earth variant) — transparent solid forms, ice-like crystal structures  
+   • AERIFORMS sigil (Wind variant) — maintaining/shaping gas clouds, mist walls  
+  
+2. SIGNS/KEYSTONES (arranged around sigil in radial or bilateral symmetry) — define HOW element manifests:  
+   • Column/Beam sign → directs element in focused column or beam (like Pyreball Seal)  
+   • Dispersion sign → spreads element outward in all directions (like a burst)  
+   • Levitation keystone → lifts and suspends objects against gravity  
+   • Wall/Barrier sign → forms element into a solid barrier or wall  
+   • Expansion sign → enlarges objects (Floating Expansion Seal)  
+   • Reduction sign (Expansion reversed) → shrinks objects (Spell of Reduction)  
+   • Repetition sign → loops or sustains the spell continuously  
+   • Billowing sign → produces large volumes of the element  
+   • Serpent/Coil sign → makes element travel in winding snake-like path  
+   • Knot sign → binds or constrains target  
+   • Directional arrow signs → guide projection direction  
+   • Vision sign → sight, scrying, or optical effects  
+   • Integration sign → reforms matter from fragments or dust (Integration Seal)  
+   • Destruction sign → breaks down solid matter to particles (Wall Breaker variant)  
+   SIGN RULE: Radial symmetry = symmetric/omnidirectional effect; Bilateral = directional; Asymmetric = unstable but valid  
+   REVERSAL RULE: Drawing a sign mirrored exactly reverses its function (expansion ↔ reduction, rise ↔ fall)  
+  
+3. RING (outer circle) — must be COMPLETE to activate the spell; a gap keeps it dormant (toggleable)  
+  
+QUALITY RULE: Larger seals are more powerful. Neater inscriptions last longer. Messy or imprecise glyphs produce weakened, unstable, or misfired effects.  
+  
+═══ NAMED SPELLS AS REFERENCE ═══  
+• Pyreball Seal — fire + column/projectile signs → launches a fireball  
+• Wall Breaker Seal — earth + destruction/impact → shatters stone walls, crumbles rock  
+• Sylph Shoes Seal — wind + propulsion + underfoot (split seal on shoe soles, activates on step)  
+• Glowstone Seal — light + dispersion + repetition → sustained ambient illumination (contraption)  
+• Serpent's Bed of Sand — sand/earth + coil + expansion → creates undulating sand terrain  
+• Floating Expansion Seal — levitation + expansion → lifts and enlarges objects  
+• Spell of Reduction — levitation reversed + reduction → shrinks objects down  
+• Integration Seal — earth + reformation → reconstitutes objects from fragments/dust  
+• Repetition Seal — repetition sign as center → causes enclosed effect to loop  
+• Cloak Spell — nested light + concealment signs → bends light for invisibility  
+• Mirror Mantle — light + reflection → deflects incoming spells (used by Knights Moralis)  
+• Memory Erasure — forbidden; affects the mind directly (body-affecting magic)  
+• Link Rings — two identical half-seals; activate when physically pressed together  
+• Sealchair — many linked sigils chained by connecting lines; creates animated chair  
+• Snugstone — warmth contraption; earth-based heat retention  
+• Myrphon Summoning — complex nested glyph invoking creature bond  
+  
+═══ ANALYSIS INSTRUCTIONS ═══  
+Look carefully at the image. The background is dark (#06060f), the ring and glyph appear in gold/amber. A pre-drawn outer circle serves as the ring. The user drew the INNER glyph (sigil + signs).  
+  
+Identify:  
+- What shape is in or near the center? → determines sigil/element  
+- What shapes/marks surround it? → determines signs/effect  
+- Is there bilateral or radial arrangement? → determines directionality  
+- Are there nested circles, connecting lines? → advanced technique  
+  
+Be SPECIFIC and PRECISE. Name spells as they would appear in the Great Library: "[Descriptive word] [Type]" e.g. "Pyreball Seal", "Serpent's Bed of Sand", "Gravity Reversal Seal", "Tidal Column Seal", "Dust Integration Seal". Avoid vague names.  
+  
+Respond ONLY with a valid JSON object, no markdown fences, no text outside it:  
+{  
+  "name": "Precise 2-5 word spell name in WHA naming style",  
+  "element": "Fire|Water|Earth|Wind|Light|Arcane",  
+  "sigil_identified": "What you see in the center and what element it suggests",  
+  "signs_identified": "Describe the surrounding marks and what signs/keystones they represent",  
+  "description": "2-3 sentences describing EXACTLY what this spell does — the physical manifestation, direction, behavior, and any notable properties — written in the precise scholarly voice of the Great Library of Spells",  
+  "effect_type": "Combat|Utility|Movement|Environmental|Contraption|Forbidden",  
+  "complexity": "Simple Glyph|Compound Seal|Linked Array|Nested Sigil",  
+  "stability_note": "One sentence about whether the glyph's proportions/symmetry suggest the spell would be stable or might misfire, and how",  
+  "lore_note": "One sentence of in-world lore about this class of spell, its historical use, or any known practitioners"  
+}`;  
+  
+async function divineSpell(){  
+  if(!S.hasDrawn||S.loading) return;  
+  S.loading=true;  
+  setState('loading');  
+  
+  const acc=analyzeAccuracy();  
+  
+  // Capture drawing  
+  const composite=document.createElement('canvas');  
+  composite.width=bgC.width; composite.height=bgC.height;  
+  const cx2=composite.getContext('2d');  
+  cx2.drawImage(bgC,0,0);  
+  cx2.drawImage(drC,0,0);  
+  const imgData=composite.toDataURL('image/jpeg',0.93).split(',')[1];  
+  
+  try{  
+    // NOTE: For final deployment, map this URL to your secure backend endpoint 
+    // to shield your API keys and avoid browser CORS blockages.
+    const res=await fetch('https://api.anthropic.com/v1/messages',{  
+      method:'POST',  
+      headers:{'Content-Type':'application/json'},  
+      body:JSON.stringify({  
+        model:'claude-3-5-sonnet-20241022',  
+        max_tokens:1000,  
+        system:WHA_PROMPT,  
+        messages:[{  
+          role:'user',  
+          content:[  
+            {type:'image',source:{type:'base64',media_type:'image/jpeg',data:imgData}},  
+            {type:'text',text:'Identify this spell glyph precisely. Examine the center for the sigil element, the surrounding marks for signs/keystones, and give the exact spell name and effects.'}  
+          ]  
+        }]  
+      })  
+    });  
+    const data=await res.json();  
+    const raw=data.content.map(c=>c.text||'').join('');  
+    const clean=raw.replace(/```json|```/g,'').trim();  
+    const spell=JSON.parse(clean);  
+    renderResult(spell,acc);  
+    applyTheme(spell.element);  
+    spawnParticles(spell.element);  
+  } catch(e){  
+    renderResult({  
+      name:'Unreadable Inscription',element:'Arcane',  
+      sigil_identified:'Indeterminate',signs_identified:'Pattern defies known catalogs',  
+      description:'This glyph resists all scholarly interpretation. Its composition is unlike any inscription recorded in the Great Library — either an artifact of a lost magical tradition, or a seal too imprecise to yield a coherent reading.',  
+      effect_type:'Unknown',complexity:'Unknown',  
+      stability_note:'Without a clear pattern, the spell\'s behavior cannot be predicted.',  
+      lore_note:'The Brimmed Hats are rumored to use intentionally obscured glyphs to foil the Knights Moralis.'  
+    },acc);  
+    applyTheme('Arcane');  
+    spawnParticles('Arcane');  
+  }  
+  S.loading=false;  
+}  
+  
+// ═══════════════════════════════════════════════════════  
+//  UI RENDERING  
+// ═══════════════════════════════════════════════════════  
+function setState(s){  
+  document.getElementById('state-empty').style.display=s==='empty'?'flex':'none';  
+  document.getElementById('state-loading').style.display=s==='loading'?'flex':'none';  
+  document.getElementById('state-result').style.display=s==='result'?'block':'none';  
+}  
+  
+function renderResult(spell,acc){  
+  setState('result');  
+  const el=document.getElementById('state-result');  
+  el.classList.remove('reveal'); void el.offsetWidth; el.classList.add('reveal');  
+  
+  // Accuracy  
+  if(acc){  
+    setTimeout(()=>{  
+      setScore('smooth',acc.strokePurity);  
+      setScore('balance',acc.sealBalance);  
+      setScore('conf',acc.lineConf);  
+      setScore('potency',acc.potency);  
+      document.getElementById('r-grade').textContent=acc.grade.l;  
+      document.getElementById('r-grade-desc').textContent=acc.grade.d;  
+    },120);  
+  }  
+  
+  // Tags  
+  const tagsEl=document.getElementById('r-tags');  
+  tagsEl.innerHTML='';  
+  [spell.element,spell.effect_type,spell.complexity].filter(Boolean).forEach(t=>{  
+    const s=document.createElement('span');  
+    s.className='spell-tag'; s.textContent=t; tagsEl.appendChild(s);  
+  });  
+  
+  document.getElementById('r-name').textContent=spell.name||'—';  
+  document.getElementById('r-desc').textContent=spell.description||'—';  
+  
+  const parts=[];  
+  if(spell.sigil_identified) parts.push('Sigil → '+spell.sigil_identified);  
+  if(spell.signs_identified)  parts.push('Signs → '+spell.signs_identified);  
+  if(spell.stability_note)    parts.push(spell.stability_note);  
+  document.getElementById('r-components').textContent=parts.join('\n\n');  
+  
+  document.getElementById('r-lore').textContent=spell.lore_note?'"'+spell.lore_note+'"':'';  
+}  
+  
+function setScore(id,val){  
+  const v=Math.max(0,Math.min(100,val));  
+  document.getElementById('b-'+id).style.width=v+'%';  
+  document.getElementById('n-'+id).textContent=v;  
+}  
+  
+function applyTheme(el){  
+  const th=getTheme(el);  
+  S.theme=th;  
+  const r=document.documentElement;  
+  r.style.setProperty('--el',th.c);  
+  r.style.setProperty('--el-glow',th.g);  
+  r.style.setProperty('--el-bg',th.bg);  
+  document.body.style.background=th.bg;  
+  glow.style.boxShadow=`0 0 40px ${th.c}55, 0 0 80px ${th.c}22`;  
+  glow.style.background=`radial-gradient(circle, ${th.c}14 0%, transparent 68%)`;  
+}  
+  
+function resetTheme(){  
+  const r=document.documentElement;  
+  ['--el','--el-glow','----el-bg'].forEach(v=>r.style.removeProperty(v));  
+  document.body.style.background='';  
+  glow.style.boxShadow=''; glow.style.background='';  
+}  
+  
+// ═══════════════════════════════════════════════════════  
+//  CONTROLS  
+// ═══════════════════════════════════════════════════════  
+document.getElementById('btn-pen').addEventListener('click',()=>{  
+  S.tool='pen';  
+  document.getElementById('btn-pen').classList.add('active');  
+  document.getElementById('btn-erase').classList.remove('active');  
+  drC.style.cursor='crosshair';  
+});  
+  
+document.getElementById('btn-erase').addEventListener('click',()=>{  
+  S.tool='eraser';  
+  document.getElementById('btn-erase').classList.add('active');  
+  document.getElementById('btn-pen').classList.remove('active');  
+  drC.style.cursor='cell';  
+});  
+  
+document.getElementById('btn-clear').addEventListener('click',()=>{  
+  S.strokes=[]; S.cur=null; S.hasDrawn=false; S.loading=false;  
+  S.particles=[];  
+  if(S.fxRafId){cancelAnimationFrame(S.fxRafId);S.fxRafId=null;}  
+  drX.clearRect(0,0,S.size,S.size);  
+  fxX.clearRect(0,0,S.size,S.size);  
+  document.getElementById('btn-cast').disabled=true;  
+  setState('empty');  
+  resetTheme();  
+});  
+  
+document.getElementById('btn-cast').addEventListener('click',divineSpell);  
+  
+// ── Fullscreen ──  
+const fsBtn=document.getElementById('fs-btn');  
+const fsExpand=document.getElementById('fs-icon-expand');  
+const fsExit=document.getElementById('fs-icon-exit');  
+  
+fsBtn.addEventListener('click',()=>{  
+  const el=document.documentElement;  
+  const inFs=!!(document.fullscreenElement||document.webkitFullscreenElement);  
+  if(!inFs){  
+    (el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen||el.msRequestFullscreen||function(){}).call(el);  
+  } else {  
+    (document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen||document.msExitFullscreen||function(){}).call(document);  
+  }  
+});  
+  
+['fullscreenchange','webkitfullscreenchange','mozfullscreenchange'].forEach(ev=>{  
+  document.addEventListener(ev,()=>{  
+    const inFs=!!(document.fullscreenElement||document.webkitFullscreenElement);  
+    fsExpand.style.display=inFs?'none':'block';  
+    fsExit.style.display=inFs?'block':'none';  
+    setTimeout(resizeAll,120);  
+  });  
+});  
+  
+// ── Prevent default browser touch handling ONLY on the canvas ──  
+drC.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});  
+drC.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});  
+  
+// ── Resize ──  
+const ro=new ResizeObserver(()=>resizeAll());  
+ro.observe(document.getElementById('canvas-area'));  
+window.addEventListener('orientationchange',()=>setTimeout(resizeAll,250));  
+  
+// ── Init ──  
+resizeAll();  
+setState('empty');  
+</script>  
+</body>  
 </html>
-HTMLEOF
-echo "Done. Size: $(wc -c < /mnt/user-data/outputs/SpellDiviner.html) bytes"
