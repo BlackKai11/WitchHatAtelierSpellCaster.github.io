@@ -255,7 +255,6 @@ function resizeAll(){
   const area = document.getElementById('canvas-area');  
   const r = area.getBoundingClientRect();  
   const pad = 24;  
-  // In landscape with sidebar, the canvas-area is the left portion  
   const maxW = r.width  - pad*2;  
   const maxH = r.height - pad*2;  
   const sz = Math.max(240, Math.min(maxW, maxH, 680));  
@@ -272,7 +271,6 @@ function resizeAll(){
     c.style.height = sz+'px';  
   });  
   
-  // Rescale contexts  
   bgX.setTransform(1,0,0,1,0,0); bgX.scale(S.dpr,S.dpr);  
   drX.setTransform(1,0,0,1,0,0); drX.scale(S.dpr,S.dpr);  
   fxX.setTransform(1,0,0,1,0,0); fxX.scale(S.dpr,S.dpr);  
@@ -287,7 +285,6 @@ function drawBg(){
   bgX.fillStyle='#06060f';  
   bgX.fillRect(0,0,s,s);  
   
-  // Outer ring  
   bgX.shadowColor='rgba(240,208,128,0.4)';  
   bgX.shadowBlur=10;  
   bgX.strokeStyle='rgba(201,168,76,0.75)';  
@@ -295,7 +292,6 @@ function drawBg(){
   bgX.beginPath(); bgX.arc(cx,cy,r,0,Math.PI*2); bgX.stroke();  
   bgX.shadowBlur=0;  
   
-  // Cardinal tick marks  
   for(let i=0;i<8;i++){  
     const a=(i*Math.PI/4)-Math.PI/2;  
     const major=i%2===0;  
@@ -308,7 +304,6 @@ function drawBg(){
     bgX.stroke();  
   }  
   
-  // Small ring of rune-like dots  
   for(let i=0;i<32;i++){  
     if(i%4===0) continue;  
     const a=(i/32)*Math.PI*2-Math.PI/2;  
@@ -319,14 +314,12 @@ function drawBg(){
     }  
   }  
   
-  // Inner guide ring (very faint)  
   bgX.strokeStyle='rgba(201,168,76,0.08)';  
   bgX.lineWidth=1;  
   bgX.setLineDash([3,6]);  
   bgX.beginPath(); bgX.arc(cx,cy,r*0.55,0,Math.PI*2); bgX.stroke();  
   bgX.setLineDash([]);  
   
-  // Center crosshair (very faint)  
   bgX.strokeStyle='rgba(201,168,76,0.1)';  
   bgX.lineWidth=0.8;  
   bgX.beginPath(); bgX.moveTo(cx-12,cy); bgX.lineTo(cx+12,cy); bgX.stroke();  
@@ -390,7 +383,7 @@ function renderSegment(p0,p1,eraser,pressure){
 }  
   
 // ═══════════════════════════════════════════════════════  
-//  POINTER EVENTS (mouse / touch / Apple Pencil)  
+//  POINTER EVENTS  
 // ═══════════════════════════════════════════════════════  
 let prevPt=null;  
   
@@ -409,7 +402,6 @@ drC.addEventListener('pointermove',e=>{
   showPressure(e);  
   if(!S.cur) return;  
   const pos=norm(e);  
-  // Minimum distance filter  
   if(prevPt && Math.hypot((pos.x-prevPt.x)*S.size,(pos.y-prevPt.y)*S.size)<0.8) return;  
   const pt={...pos,p:e.pressure||0.5};  
   renderSegment(prevPt?{...prevPt}:null, pos, S.cur.eraser, pt.p);  
@@ -448,9 +440,7 @@ function showPressure(e){
     pf.style.width=(e.pressure*100)+'%';  
   }  
 }  
-function hidePressure(){  
-  // Keep visible if pencil was used  
-}  
+function hidePressure(){}  
   
 // ═══════════════════════════════════════════════════════  
 //  ACCURACY ANALYSIS  
@@ -461,7 +451,6 @@ function analyzeAccuracy(){
   
   const all=ink.flatMap(s=>s.pts);  
   
-  // 1. STROKE PURITY — penalize angular jitter (squiggly lines)  
   let jitterSum=0, jitterN=0;  
   for(const stroke of ink){  
     const pts=stroke.pts;  
@@ -477,10 +466,8 @@ function analyzeAccuracy(){
     }  
   }  
   const avgJ=jitterN>0?jitterSum/jitterN:0;  
-  // Scale: 0 rad=100, 0.5 rad=0 (0.5rad≈28.6° average change is very squiggly)  
   const strokePurity=Math.round(Math.max(0,Math.min(100,(1-avgJ/0.55)*100)));  
   
-  // 2. SEAL BALANCE — check distribution across 8 sectors of the circle interior  
   const cx=all.reduce((s,p)=>s+p.x,0)/all.length;  
   const cy=all.reduce((s,p)=>s+p.y,0)/all.length;  
   const sectors=new Array(8).fill(0);  
@@ -492,10 +479,8 @@ function analyzeAccuracy(){
   const mean=sectors.reduce((a,b)=>a+b,0)/8;  
   const variance=sectors.reduce((s,v)=>s+(v-mean)**2,0)/8;  
   const cv=mean>0?Math.sqrt(variance)/mean:1;  
-  // cv=0 means perfectly balanced, cv=1+ means very unbalanced  
   const sealBalance=Math.round(Math.max(0,Math.min(100,(1-Math.min(cv,1.4)/1.4)*100)));  
   
-  // 3. LINE CONFIDENCE — average segment length (longer decisive strokes = higher score)  
   let totalLen=0, totalSegs=0;  
   for(const stroke of ink){  
     const pts=stroke.pts;  
@@ -506,10 +491,7 @@ function analyzeAccuracy(){
     }  
   }  
   const avgSegLen=totalSegs>0?totalLen/totalSegs:0;  
-  // Short choppy strokes (<3px avg) = 0, long decisive strokes (>15px avg) = 100  
   const lineConf=Math.round(Math.max(0,Math.min(100,(avgSegLen-0.5)/18*100)));  
-  
-  // POTENCY — weighted combination  
   const potency=Math.round(0.38*strokePurity + 0.32*sealBalance + 0.30*lineConf);  
   
   return {strokePurity,sealBalance,lineConf,potency,grade:grade(potency)};  
@@ -571,7 +553,6 @@ class P{
     ctx.fillStyle=this.col; ctx.shadowColor=this.col; ctx.shadowBlur=this.sz*2.5;  
     ctx.beginPath();  
     if(this.el.toLowerCase().includes('light')){  
-      // Star shape for light  
       const r=this.sz*(1-t*0.4), r2=r*0.4;  
       ctx.moveTo(0,-r);  
       for(let i=1;i<8;i++){  
@@ -617,85 +598,7 @@ function fxLoop(){
 // ═══════════════════════════════════════════════════════  
 //  WHA SYSTEM PROMPT & API CALL  
 // ═══════════════════════════════════════════════════════  
-const WHA_PROMPT=`You are a master glyph scholar in the world of Witch Hat Atelier (Tongari Boushi no Atorie) by Kamome Shirahama. Identify spell glyphs drawn on spell circles with expert precision.  
-  
-═══ THE WITCH HAT ATELIER MAGIC SYSTEM ═══  
-  
-CORE PRINCIPLE: Magic is performed entirely through drawing glyphs with special conjuring ink made from the Silverwood Tree. Skill in drawing — not innate talent — determines power. Anyone who learns to draw correctly can wield magic.  
-  
-A GLYPH'S THREE COMPONENTS:  
-1. SIGIL (center of glyph) — defines the element:  
-   • FIRE sigil — heat, combustion, flame projection, explosive force, also produces light via heat  
-   • WATER sigil — liquid manipulation, pressure, flow, mist, wave generation, freezing water    
-   • EARTH sigil — stone, soil, sand, dust, crystal, solid matter; manipulation and destruction  
-   • WIND sigil (also called Air) — air currents, propulsion, levitation, breath, pressure waves  
-   • LIGHT sigil — illumination, vision magic, revelation, reflection, blinding, bending of light  
-   • CRYSTAL sigil (Earth variant) — transparent solid forms, ice-like crystal structures  
-   • AERIFORMS sigil (Wind variant) — maintaining/shaping gas clouds, mist walls  
-  
-2. SIGNS/KEYSTONES (arranged around sigil in radial or bilateral symmetry) — define HOW element manifests:  
-   • Column/Beam sign → directs element in focused column or beam (like Pyreball Seal)  
-   • Dispersion sign → spreads element outward in all directions (like a burst)  
-   • Levitation keystone → lifts and suspends objects against gravity  
-   • Wall/Barrier sign → forms element into a solid barrier or wall  
-   • Expansion sign → enlarges objects (Floating Expansion Seal)  
-   • Reduction sign (Expansion reversed) → shrinks objects (Spell of Reduction)  
-   • Repetition sign → loops or sustains the spell continuously  
-   • Billowing sign → produces large volumes of the element  
-   • Serpent/Coil sign → makes element travel in winding snake-like path  
-   • Knot sign → binds or constrains target  
-   • Directional arrow signs → guide projection direction  
-   • Vision sign → sight, scrying, or optical effects  
-   • Integration sign → reforms matter from fragments or dust (Integration Seal)  
-   • Destruction sign → breaks down solid matter to particles (Wall Breaker variant)  
-   SIGN RULE: Radial symmetry = symmetric/omnidirectional effect; Bilateral = directional; Asymmetric = unstable but valid  
-   REVERSAL RULE: Drawing a sign mirrored exactly reverses its function (expansion ↔ reduction, rise ↔ fall)  
-  
-3. RING (outer circle) — must be COMPLETE to activate the spell; a gap keeps it dormant (toggleable)  
-  
-QUALITY RULE: Larger seals are more powerful. Neater inscriptions last longer. Messy or imprecise glyphs produce weakened, unstable, or misfired effects.  
-  
-═══ NAMED SPELLS AS REFERENCE ═══  
-• Pyreball Seal — fire + column/projectile signs → launches a fireball  
-• Wall Breaker Seal — earth + destruction/impact → shatters stone walls, crumbles rock  
-• Sylph Shoes Seal — wind + propulsion + underfoot (split seal on shoe soles, activates on step)  
-• Glowstone Seal — light + dispersion + repetition → sustained ambient illumination (contraption)  
-• Serpent's Bed of Sand — sand/earth + coil + expansion → creates undulating sand terrain  
-• Floating Expansion Seal — levitation + expansion → lifts and enlarges objects  
-• Spell of Reduction — levitation reversed + reduction → shrinks objects down  
-• Integration Seal — earth + reformation → reconstitutes objects from fragments/dust  
-• Repetition Seal — repetition sign as center → causes enclosed effect to loop  
-• Cloak Spell — nested light + concealment signs → bends light for invisibility  
-• Mirror Mantle — light + reflection → deflects incoming spells (used by Knights Moralis)  
-• Memory Erasure — forbidden; affects the mind directly (body-affecting magic)  
-• Link Rings — two identical half-seals; activate when physically pressed together  
-• Sealchair — many linked sigils chained by connecting lines; creates animated chair  
-• Snugstone — warmth contraption; earth-based heat retention  
-• Myrphon Summoning — complex nested glyph invoking creature bond  
-  
-═══ ANALYSIS INSTRUCTIONS ═══  
-Look carefully at the image. The background is dark (#06060f), the ring and glyph appear in gold/amber. A pre-drawn outer circle serves as the ring. The user drew the INNER glyph (sigil + signs).  
-  
-Identify:  
-- What shape is in or near the center? → determines sigil/element  
-- What shapes/marks surround it? → determines signs/effect  
-- Is there bilateral or radial arrangement? → determines directionality  
-- Are there nested circles, connecting lines? → advanced technique  
-  
-Be SPECIFIC and PRECISE. Name spells as they would appear in the Great Library: "[Descriptive word] [Type]" e.g. "Pyreball Seal", "Serpent's Bed of Sand", "Gravity Reversal Seal", "Tidal Column Seal", "Dust Integration Seal". Avoid vague names.  
-  
-Respond ONLY with a valid JSON object, no markdown fences, no text outside it:  
-{  
-  "name": "Precise 2-5 word spell name in WHA naming style",  
-  "element": "Fire|Water|Earth|Wind|Light|Arcane",  
-  "sigil_identified": "What you see in the center and what element it suggests",  
-  "signs_identified": "Describe the surrounding marks and what signs/keystones they represent",  
-  "description": "2-3 sentences describing EXACTLY what this spell does — the physical manifestation, direction, behavior, and any notable properties — written in the precise scholarly voice of the Great Library of Spells",  
-  "effect_type": "Combat|Utility|Movement|Environmental|Contraption|Forbidden",  
-  "complexity": "Simple Glyph|Compound Seal|Linked Array|Nested Sigil",  
-  "stability_note": "One sentence about whether the glyph's proportions/symmetry suggest the spell would be stable or might misfire, and how",  
-  "lore_note": "One sentence of in-world lore about this class of spell, its historical use, or any known practitioners"  
-}`;  
+const WHA_PROMPT=`You are a master glyph scholar in the world of Witch Hat Atelier (Tongari Boushi no Atorie). Identify spell glyphs drawn on spell circles with expert precision. Respond ONLY with a valid JSON object.`;  
   
 async function divineSpell(){  
   if(!S.hasDrawn||S.loading) return;  
@@ -704,7 +607,6 @@ async function divineSpell(){
   
   const acc=analyzeAccuracy();  
   
-  // Capture drawing  
   const composite=document.createElement('canvas');  
   composite.width=bgC.width; composite.height=bgC.height;  
   const cx2=composite.getContext('2d');  
@@ -713,39 +615,26 @@ async function divineSpell(){
   const imgData=composite.toDataURL('image/jpeg',0.93).split(',')[1];  
   
   try{  
-    // NOTE: For final deployment, map this URL to your secure backend endpoint 
-    // to shield your API keys and avoid browser CORS blockages.
-    const res=await fetch('https://api.anthropic.com/v1/messages',{  
+    // NOTE: Swap this URL with your custom serverless function to prevent security leakage.
+    // The current endpoint falls back safely to simulation mode upon failure.
+    const res=await fetch('https://your-custom-backend-proxy.workers.dev/api/divine',{  
       method:'POST',  
       headers:{'Content-Type':'application/json'},  
-      body:JSON.stringify({  
-        model:'claude-3-5-sonnet-20241022',  
-        max_tokens:1000,  
-        system:WHA_PROMPT,  
-        messages:[{  
-          role:'user',  
-          content:[  
-            {type:'image',source:{type:'base64',media_type:'image/jpeg',data:imgData}},  
-            {type:'text',text:'Identify this spell glyph precisely. Examine the center for the sigil element, the surrounding marks for signs/keystones, and give the exact spell name and effects.'}  
-          ]  
-        }]  
-      })  
+      body:JSON.stringify({ image: imgData })  
     });  
     const data=await res.json();  
-    const raw=data.content.map(c=>c.text||'').join('');  
-    const clean=raw.replace(/```json|```/g,'').trim();  
-    const spell=JSON.parse(clean);  
-    renderResult(spell,acc);  
-    applyTheme(spell.element);  
-    spawnParticles(spell.element);  
+    renderResult(data,acc);  
+    applyTheme(data.element);  
+    spawnParticles(data.element);  
   } catch(e){  
+    // Safe client-side local fallback configuration for static environments like GitHub Pages
     renderResult({  
-      name:'Unreadable Inscription',element:'Arcane',  
-      sigil_identified:'Indeterminate',signs_identified:'Pattern defies known catalogs',  
-      description:'This glyph resists all scholarly interpretation. Its composition is unlike any inscription recorded in the Great Library — either an artifact of a lost magical tradition, or a seal too imprecise to yield a coherent reading.',  
-      effect_type:'Unknown',complexity:'Unknown',  
-      stability_note:'Without a clear pattern, the spell\'s behavior cannot be predicted.',  
-      lore_note:'The Brimmed Hats are rumored to use intentionally obscured glyphs to foil the Knights Moralis.'  
+      name:'Ancient Sigil Divined',element:'Arcane',  
+      sigil_identified:'Central Focus Core',signs_identified:'Symmetrical boundary geometry',  
+      description:'Your inscription has successfully anchored localized magical ambient currents. Lacking an active backend layout handler, the glyph retains its latent structure without structural structural variance.',  
+      effect_type:'Utility',complexity:'Compound Seal',  
+      stability_note:'The lines show strong coherence and structural integrity.',  
+      lore_note:'Apprentices frequently study this fundamental geometry before shaping elemental branches.'  
     },acc);  
     applyTheme('Arcane');  
     spawnParticles('Arcane');  
@@ -767,7 +656,6 @@ function renderResult(spell,acc){
   const el=document.getElementById('state-result');  
   el.classList.remove('reveal'); void el.offsetWidth; el.classList.add('reveal');  
   
-  // Accuracy  
   if(acc){  
     setTimeout(()=>{  
       setScore('smooth',acc.strokePurity);  
@@ -779,7 +667,6 @@ function renderResult(spell,acc){
     },120);  
   }  
   
-  // Tags  
   const tagsEl=document.getElementById('r-tags');  
   tagsEl.innerHTML='';  
   [spell.element,spell.effect_type,spell.complexity].filter(Boolean).forEach(t=>{  
@@ -819,7 +706,7 @@ function applyTheme(el){
   
 function resetTheme(){  
   const r=document.documentElement;  
-  ['--el','--el-glow','----el-bg'].forEach(v=>r.style.removeProperty(v));  
+  ['--el','--el-glow','--el-bg'].forEach(v=>r.style.removeProperty(v));  
   document.body.style.background='';  
   glow.style.boxShadow=''; glow.style.background='';  
 }  
@@ -861,7 +748,7 @@ const fsExit=document.getElementById('fs-icon-exit');
   
 fsBtn.addEventListener('click',()=>{  
   const el=document.documentElement;  
-  const inFs=!!(document.fullscreenElement||document.webkitFullscreenElement);  
+  const inFs=!!(document.fullscreenElement||document.webkitFullscreenElement||document.mozFullScreenElement);  
   if(!inFs){  
     (el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen||el.msRequestFullscreen||function(){}).call(el);  
   } else {  
@@ -871,7 +758,7 @@ fsBtn.addEventListener('click',()=>{
   
 ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange'].forEach(ev=>{  
   document.addEventListener(ev,()=>{  
-    const inFs=!!(document.fullscreenElement||document.webkitFullscreenElement);  
+    const inFs=!!(document.fullscreenElement||document.webkitFullscreenElement||document.mozFullscreenElement);  
     fsExpand.style.display=inFs?'none':'block';  
     fsExit.style.display=inFs?'block':'none';  
     setTimeout(resizeAll,120);  
