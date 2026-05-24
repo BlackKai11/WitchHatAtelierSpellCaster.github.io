@@ -641,63 +641,20 @@ const res = await fetch(WORKER_URL, {
 const raw = await res.text();
 const spell = JSON.parse(raw.replace(/```json|```/g, '').trim());
     
-    if (!response.ok) throw new Error('API processing error');
-    const aiData = await response.json();
+  renderResult(spell, acc);
+applyTheme(spell.element, spell.allElements);
+spawnFx(spell.element, circles);
     
-    // Fallback if AI string returns unreadable
-    if (aiData.status === 'unreadable' || !aiData.spellName) {
-      showUnreadable("The glyph arrangement couldn't be parsed into operational Magic Forms.");
-      return;
-    }
     
-    // Update Layout Elements with Results
-    document.getElementById('inv-p').style.display = 'none';
-    document.getElementById('sp-p').style.display = 'block';
-    
-    document.getElementById('r-name').innerText = aiData.spellName;
-    document.getElementById('r-desc').innerText = aiData.description;
-    document.getElementById('r-parts').innerText = `Core Sigil: ${aiData.coreSigil}\nSigns: ${aiData.signs.join(', ')}`;
-    
-    const tagsWrapper = document.getElementById('r-tags');
-    tagsWrapper.innerHTML = '';
-    aiData.tags.forEach(t => {
-      const el = document.createElement('span'); el.className = 'tag'; el.innerText = t; tagsWrapper.appendChild(el);
-    });
-    
-    // Display Accuracy Parameters
-    document.getElementById('r-g').innerText = acc.grade.l;
-    document.getElementById('r-gd').innerText = acc.grade.d;
-    document.getElementById('bsm').style.width = acc.strokePurity + '%'; document.getElementById('nsm').innerText = acc.strokePurity;
-    document.getElementById('bba').style.width = acc.sealBalance + '%'; document.getElementById('nba').innerText = acc.sealBalance;
-    document.getElementById('brp').style.width = acc.ringPrecision + '%'; document.getElementById('nrp').innerText = acc.ringPrecision;
-    document.getElementById('blc').style.width = acc.lineConf + '%'; document.getElementById('nlc').innerText = acc.lineConf;
-    document.getElementById('bpo').style.width = acc.potency + '%'; document.getElementById('npo').innerText = acc.potency;
-    
-    applyTheme(aiData.coreSigil);
-    spawnFx(aiData.coreSigil, circles);
-    setState('result');
-    
-  } catch (err) {
-    console.error(err);
-    // Graceful alternative fallback display layout using analytical metrics
-    if (acc && acc.potency > 25) {
-      document.getElementById('inv-p').style.display = 'none';
-      document.getElementById('sp-p').style.display = 'block';
-      document.getElementById('r-name').innerText = "Unregistered Manifestation";
-      document.getElementById('r-desc').innerText = "The pattern registers strong ink density but bypasses traditional Great Library classification indices.";
-      document.getElementById('r-parts').innerText = "Core Sigil: Latent\nSigns: Undefined Paths";
-      document.getElementById('r-g').innerText = acc.grade.l;
-      document.getElementById('r-gd').innerText = acc.grade.d;
-      document.getElementById('bpo').style.width = acc.potency + '%'; document.getElementById('npo').innerText = acc.potency;
-      applyTheme('Arcane');
-      spawnFx('Arcane', circles);
-      setState('result');
-    } else {
-      showUnreadable("Connection severed or inscription failed to form stable baseline parameters.");
-    }
-  } finally {
-    S.loading = false;
-  }
+ } catch (err) {
+  console.error(err);
+  renderResult({
+    valid: false,
+    invalidReason: 'Connection to the Great Library failed. Check your connection and try again.'
+  }, acc);
+  resetTheme();
+} finally {
+  S.loading = false;
 }
 
 function showUnreadable(msg) {
