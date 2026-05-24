@@ -853,7 +853,15 @@ async function castGlyph() {
     if (!res.ok) throw new Error('Worker returned status ' + res.status);
 
     const raw = await res.text();
-    const spell = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    
+    // Clean string response safely before parsing
+    let cleanJsonStr = raw.trim();
+    if (cleanJsonStr.includes("```")) {
+      cleanJsonStr = cleanJsonStr.replace(/```json/gi, '').replace(/```/g, '').trim();
+    }
+    
+    // Secondary safety: Parse JSON safely
+    const spell = JSON.parse(cleanJsonStr);
 
     renderResult(spell, acc);
     applyTheme(spell.element || 'Arcane');
