@@ -627,11 +627,19 @@ async function castGlyph() {
   
   try {
     // 5. Send payload containing base64 data URL to your backend API route
-    const response = await fetch('/api/identify-glyph', { 
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: base64Image })
-    });
+    const WORKER_URL = 'https://spell-casting.yourname.workers.dev';
+
+const res = await fetch(WORKER_URL, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    image: base64,
+    prompt: PROMPT
+  })
+});
+
+const raw = await res.text();
+const spell = JSON.parse(raw.replace(/```json|```/g, '').trim());
     
     if (!response.ok) throw new Error('API processing error');
     const aiData = await response.json();
