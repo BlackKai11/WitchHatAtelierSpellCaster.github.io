@@ -29,78 +29,64 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--eb);font-famil
   #sb{grid-column:2;grid-row:2/4;border-left:1px solid var(--br);border-top:none;max-height:none}
   #tb{grid-column:1;grid-row:3}
 }
-/* Header */
 #hdr{display:flex;align-items:center;justify-content:space-between;
   padding:.6rem 1rem;border-bottom:1px solid var(--br);
   background:rgba(244,241,227,.93);backdrop-filter:blur(14px);z-index:30;transition:border-color 1s}
 .hs{font-size:.58rem;letter-spacing:.32em;text-transform:uppercase;color:var(--el);font-weight:700;transition:color 1s}
-.ht{font-size:1.05rem;color:var(--eg);letter-spacing:.07em;text-shadow:0 0 16px rgba(0,0,0,.05);font-weight:500;transition:all 1s}
+.ht{font-size:1.05rem;color:var(--eg);letter-spacing:.07em;font-weight:500;transition:all 1s}
 .pbadge{font-size:.62rem;letter-spacing:.06em;color:var(--td);font-weight:700;
   padding:.22rem .55rem;border:1px solid var(--br);border-radius:3px;
   display:none;align-items:center;gap:.28rem}
 .pbadge.on{display:flex}
-.pbd{width:6px;height:6px;border-radius:50%;background:var(--el);box-shadow:0 0 5px var(--el);animation:blink 1.4s ease infinite}
-/* Canvas area */
+.pbd{width:6px;height:6px;border-radius:50%;background:var(--el);animation:blink 1.4s ease infinite}
 #ca{position:relative;display:flex;align-items:center;justify-content:center;
   overflow:hidden;background:var(--eb);transition:background 1.2s;
-  background-image: radial-gradient(rgba(0,0,0,0.03) 1px, transparent 0);
-  background-size: 24px 24px;}
+  background-image:radial-gradient(rgba(0,0,0,0.03) 1px,transparent 0);background-size:24px 24px}
 #cw{position:relative;border-radius:50%;flex-shrink:0}
 #bc,#dc,#fc{position:absolute;top:0;left:0;border-radius:50%}
 #bc{z-index:1;pointer-events:none}
 #fc{z-index:3;pointer-events:none}
 #dc{z-index:2;touch-action:none;cursor:crosshair}
 #rg{position:absolute;inset:-22px;border-radius:50%;pointer-events:none;z-index:0;
-  transition:box-shadow 1.2s,background 1.2s;box-shadow:0 0 20px rgba(26,26,26,.04)}
-/* Toolbar */
+  transition:box-shadow 1.2s,background 1.2s}
 #tb{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
   gap:.4rem;padding:.6rem .8rem;min-height:58px;
   border-top:1px solid var(--br);background:rgba(244,241,227,.94);
-  backdrop-filter:blur(14px);z-index:20;transition:border-color 1s}
-.btn{padding:.5rem .95rem;min-height:44px;
-  border:1px solid var(--br);background:transparent;
+  backdrop-filter:blur(14px);z-index:20}
+.btn{padding:.5rem .95rem;min-height:44px;border:1px solid var(--br);background:transparent;
   color:var(--el);font-family:var(--ff);font-size:.8rem;font-weight:700;
-  letter-spacing:.06em;border-radius:4px;cursor:pointer;
-  transition:all .2s;-webkit-tap-highlight-color:transparent;white-space:nowrap;
-  display:flex;align-items:center;justify-content:center}
-.btn:active,.btn.on{background:var(--el);color:#f4f1e3;border-color:var(--el)}
-.cast-btn{padding:.5rem 1.8rem;min-height:44px;
-  border:1px solid var(--el);
-  background:linear-gradient(135deg,rgba(26,26,26,.05),rgba(26,26,26,.1));
-  color:var(--eg);font-family:var(--ff);font-size:.88rem;font-weight:700;
-  letter-spacing:.12em;border-radius:4px;cursor:pointer;
-  transition:all .3s;box-shadow:0 0 12px rgba(26,26,26,.05);
+  letter-spacing:.06em;border-radius:4px;cursor:pointer;transition:all .2s;
   -webkit-tap-highlight-color:transparent;white-space:nowrap;
   display:flex;align-items:center;justify-content:center}
-.cast-btn:disabled{opacity:.3;cursor:default;box-shadow:none;border-color:var(--br);color:var(--td);background:transparent}
+.btn:active,.btn.on{background:var(--el);color:#f4f1e3;border-color:var(--el)}
+.cast-btn{padding:.5rem 1.8rem;min-height:44px;border:1px solid var(--el);
+  background:linear-gradient(135deg,rgba(26,26,26,.05),rgba(26,26,26,.1));
+  color:var(--eg);font-family:var(--ff);font-size:.88rem;font-weight:700;
+  letter-spacing:.12em;border-radius:4px;cursor:pointer;transition:all .3s;
+  -webkit-tap-highlight-color:transparent;white-space:nowrap;
+  display:flex;align-items:center;justify-content:center}
+.cast-btn:disabled{opacity:.3;cursor:default;border-color:var(--br);color:var(--td);background:transparent}
 .cast-btn:not(:disabled):active{transform:scale(.97)}
 .pbw{display:none;align-items:center;gap:.4rem;min-height:44px}
 .pbw.on{display:flex}
 .pbl{font-size:.62rem;color:var(--td);font-weight:700;letter-spacing:.04em;white-space:nowrap}
 .pbb{width:55px;height:2px;background:rgba(0,0,0,.08);border-radius:1px}
 .pbf{height:100%;border-radius:1px;background:var(--el);transition:width .08s}
-/* Sidebar */
-#sb{background:var(--sf);border-top:1px solid var(--br);
-  overflow-y:auto;overflow-x:hidden;
-  padding:1rem;display:flex;flex-direction:column;gap:.8rem;
-  transition:border-color 1s;
-  scrollbar-width:thin;scrollbar-color:var(--br) transparent;
-  max-height:44vh}
+#sb{background:var(--sf);border-top:1px solid var(--br);overflow-y:auto;overflow-x:hidden;
+  padding:1rem;display:flex;flex-direction:column;gap:.8rem;transition:border-color 1s;
+  scrollbar-width:thin;scrollbar-color:var(--br) transparent;max-height:44vh}
 #sb::-webkit-scrollbar{width:3px}
 #sb::-webkit-scrollbar-thumb{background:var(--br);border-radius:2px}
-/* States */
 .sc{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;padding:1.2rem 0}
 .stxt{font-size:.8rem;color:var(--tx);text-align:center;line-height:1.8;letter-spacing:.06em;opacity:.6;font-weight:600}
 .sp{animation:spin 3s linear infinite}
 .sr{animation:spin 2s linear infinite reverse;transform-origin:center}
 .sec{font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:var(--el);
   border-bottom:1px solid var(--br);padding-bottom:.3rem;font-weight:700;transition:color 1s,border-color 1s}
-/* Grade */
 .gb{border:1px solid var(--br);border-radius:5px;padding:.62rem .82rem;text-align:center;
   background:rgba(26,26,26,.03);transition:border-color 1s}
 .gl{font-size:1rem;color:var(--eg);letter-spacing:.05em;font-weight:600;transition:color 1s}
 .gd{font-size:.72rem;color:var(--td);margin-top:.25rem;line-height:1.6;font-style:italic;font-weight:600}
-/* Score rows */
 .srow{display:flex;align-items:center;gap:.55rem;margin-top:.38rem}
 .slbl{font-size:.69rem;color:var(--td);letter-spacing:.03em;width:114px;flex-shrink:0;font-weight:700}
 .sbar{flex:1;height:3px;background:rgba(0,0,0,.06);border-radius:2px;overflow:hidden}
@@ -108,7 +94,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--eb);font-famil
   background:linear-gradient(to right,var(--gd),var(--el))}
 .snum{font-size:.73rem;color:var(--el);width:26px;text-align:right;font-weight:800}
 #bpot .sfil{background:linear-gradient(to right,var(--gd),var(--el),var(--gl))}
-/* Ethics */
 .ebox{display:flex;align-items:flex-start;gap:.65rem;border-radius:5px;padding:.65rem .82rem;border:1px solid;transition:all .5s}
 .ebox.p{border-color:rgba(40,160,60,.42);background:rgba(40,160,60,.06)}
 .ebox.f{border-color:rgba(200,30,30,.42);background:rgba(200,30,30,.06)}
@@ -117,16 +102,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--eb);font-famil
 .elbl.p{color:#278a3e}
 .elbl.f{color:#b82525}
 .ersn{font-size:.71rem;color:var(--td);line-height:1.62;font-style:italic;font-weight:600}
-/* Invalid */
 .inv-b{border:1px solid rgba(200,30,30,.38);border-radius:4px;padding:.65rem .82rem;background:rgba(200,30,30,.05)}
 .inv-t{font-size:.84rem;color:#b82525;font-weight:700;letter-spacing:.05em}
 .inv-d{font-size:.72rem;color:#7a1f1f;margin-top:.28rem;line-height:1.6;font-weight:600}
-/* Spell result */
 .tagr{display:flex;gap:.28rem;flex-wrap:wrap}
 .tag{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--el);
   border:1px solid currentColor;border-radius:2px;padding:.1rem .4rem;transition:color 1s;font-weight:700}
-.snm{font-size:1.46rem;color:var(--eg);letter-spacing:.04em;font-weight:500;line-height:1.2;
-  text-shadow:0 0 18px rgba(0,0,0,.02);transition:all 1s}
+.snm{font-size:1.46rem;color:var(--eg);letter-spacing:.04em;font-weight:500;line-height:1.2;transition:all 1s}
 .dvd{height:1px;background:linear-gradient(to right,var(--el) 35%,transparent);margin:.05rem 0;transition:background 1s}
 .sdesc{font-size:.84rem;line-height:1.82;color:var(--tx);font-style:italic;font-weight:500}
 .sparts{font-size:.72rem;line-height:1.68;color:var(--td);border-top:1px solid var(--br);
@@ -175,7 +157,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--eb);font-famil
   <div class="sc" id="st-l" style="display:none">
     <svg width="48" height="48" viewBox="0 0 48 48" class="sp">
       <circle cx="24" cy="24" r="20" fill="none" stroke="#1a1a1a" stroke-width="1.2" stroke-dasharray="7 4.5" opacity=".5"/>
-      <circle cx="24" cy="24" r="12" fill="none" stroke="#555555" stroke-width=".9" stroke-dasharray="3.5 4" opacity=".35" class="sr"/>
+      <circle cx="24" cy="24" r="12" fill="none" stroke="#555" stroke-width=".9" stroke-dasharray="3.5 4" opacity=".35" class="sr"/>
       <circle cx="24" cy="24" r="3.2" fill="#1a1a1a"/>
     </svg>
     <div class="stxt" style="opacity:1;animation:pulse 1.8s ease infinite;font-weight:700">Consulting the Great Library…</div>
@@ -227,19 +209,133 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--eb);font-famil
   <button class="cast-btn" id="btn-cast" disabled>✦ Cast Glyph</button>
 </div>
 </div>
+
 <script>
 'use strict';
 
+// ═══════════ WORKER URL ═══════════
+const WORKER_URL = 'https://little-meadow-ac51.noahallem4.workers.dev';
+
+// ═══════════ WHA PROMPT (sent to Gemini via Worker) ═══════════
+const PROMPT = `You are the foremost glyph scholar in the world of Witch Hat Atelier (Tongari Boushi no Atorie) by Kamome Shirahama. Analyze hand-drawn spell glyphs with complete canonical precision and return ONLY a JSON object, no markdown, no extra text.
+
+MAGIC SYSTEM:
+- Magic requires Conjuring Ink (from Silverwood Tree) and drawing skill. Anyone can cast.
+- Spell activates ONLY when ring is fully closed.
+- Larger seals = more powerful. Neater seals = last longer. Unequal signs = misfire.
+- Reversing a sign's orientation reverses its effect.
+- The decorative ring at the canvas edge is the APP BORDER, NOT the spell ring. Only count user-drawn inner circles.
+
+GLYPH ANATOMY:
+1. SIGIL (center): determines the element
+2. SIGNS/KEYSTONES (surrounding sigil): determine how the element manifests
+3. RING (drawn circle): activates the spell when complete
+
+THE FIVE MAIN SIGILS:
+FIRE: Angular crossed lines forming diamond/X with flame-like branch tips. Combustion, heat, projectile fire, explosive force.
+WATER: Flowing vertical stroke with undulating horizontal wave branches. Liquid jets, pressure waves, mist, directional streams.
+EARTH: Downward-pointing triangle or stacked horizontal ground lines beneath triangular top. Stone, sand, soil, crystal, structural manipulation.
+WIND/AIR: Curving directional arrows or swirling marks. Air currents, propulsion, levitation, atmospheric effects.
+LIGHT: Radiating lines from a central point, starburst or cross-with-rays. Illumination, reflection, bending light, invisibility, scrying.
+SIGN-AS-SIGIL: Vision, Repetition, or Billowing can occupy center position. Valid canonical technique.
+
+ALL KNOWN SIGNS/KEYSTONES:
+COLUMN: Parallel elongated bracket marks all pointing same direction. Focused high-speed beam of element.
+DISPERSION: Curved arc/bracket facing in or out. Releases element in all directions simultaneously. Inverted mimics Column.
+LEVITATION: Arrow-like mark facing INWARD toward sigil. Levitates generated element or the object the seal is drawn on.
+PULL: Inward-pointing arrow attracting element. Reversed (outward) = repels.
+CRUSH: Compressing marks inward. Crushes/compresses elements with force.
+FLOAT: Gentle suspension marks. Lighter than Levitation.
+CONVERGENCE: Lines converging to a focal point. Concentrates maximum energy at one spot.
+COLLECTION: Gathering marks pulling element from wide area into concentrated mass.
+BILLOWING: Large expanding curved marks. Produces massive volumes of element.
+REPETITION: Loop/cyclical marks or concentric circle. Sustains spell continuously. Can serve as central element replacing the sigil.
+VISION: Detailed eye or lens shape. Optical effects, scrying, vision transmission, illusion.
+WEAVE: Interlaced crossing lines forming lattice. Interlocks effects, creates mesh manifestation.
+ENLARGE: Outward expanding arrows. Makes element physically larger. Reversed = SHRINKS (Spell of Reduction).
+RAIN: Downward falling drop or streak marks. Causes element to fall like precipitation.
+BIRD: Wing-shaped marks. Element moves in graceful bird-like arcing flight, splitting into formations.
+DANCING PUPPET: Dynamic dart-like marks. Element darts unpredictably like animated objects.
+REGION: Boundary-defining marks. Limits spell effect to a specific zone.
+ENTWINE: Spiral or coiling marks. Wraps element around a target.
+GATHER: Wide-area collecting marks.
+GLAIVES: Claw-shaped protrusions. Determines how firmly a spell embeds in a body. Nearly always FORBIDDEN.
+DIAMOND: Rhombus shapes. Wider = wider area of effect.
+WINDOW: Rectangular frame. Defines area/boundary. Combined with Enlarge = physically enlarges object.
+CROSSHAIR: Cross-shaped targeting marks. Improves precision and accuracy.
+RADIAL: Lines radiating from sigil. Inward-facing = diminishes element. Outward-facing = amplifies element.
+BOLT: Zigzag lightning-bolt shapes. Rapid high-energy projectile discharge.
+EYE: Oval eye shape. Enhances sight or perception.
+BEND: Curved redirecting arc. Redirects spell mid-flight to change direction.
+LINK: Connecting line joining two seals so their effects combine.
+BIND: Constraining marks. Traps or prevents movement of targets.
+ORB: Circular formation marks. Creates spherical manifestation.
+
+CANONICAL NAMED SPELLS FOR REFERENCE:
+Pyreball Seal: Fire + Levitation + Column = levitating fireball projectile
+Wall Breaker Seal: Earth + Column = focused force that shatters stone walls
+Integration Seal: Earth + Gather = reconstitutes objects from dust/fragments
+Sylph Shoes: Wind Underfoot + Levitation split across shoe soles = sustained flight
+Glowstone Seal: Light + Dispersion + Repetition = sustained ambient illumination contraption
+Bird of Light Beacon: Light + Dispersion + Bird = light that moves in bird-like formations
+Mirror Mantle: Light + Bend + Convergence = deflects/reflects incoming spells
+Cloak Spell: Light + Vision nested glyph = bends light for invisibility
+Floating Expansion Seal: Levitation + Enlarge = lifts and magnifies objects
+Spell of Reduction: Reversed Levitation + Reversed Enlarge = shrinks objects
+Memory Erasure: Glaives + body-affecting = ONLY permitted body-affecting spell
+
+MULTI-GLYPH RULES:
+NESTED: Inner ring inside outer ring. Inner activates when outer completes. Effects amplify.
+LINKED: Circles connected by drawn lines. Effects merge into compound spell.
+LINKED ARRAY: 3+ circles in a pattern. Identify each circle's sigil and signs separately then describe combined effect.
+
+FORBIDDEN MAGIC (Day of the Pact):
+Flag as ethics:"Forbidden" if the spell would:
+1. Be drawn directly on a living body or affect living biological tissue
+2. Heal a living body (healing magic is explicitly forbidden)
+3. Transform a living being (body transformation)
+4. Control minds or emotions
+5. De-age, age, or extend life
+6. Teleport a living body directly (teleportation through doors/mirrors IS permitted)
+7. Cause island-scale or larger irreversible environmental catastrophe
+8. Warp reality on a massive/fundamental scale
+9. Involve Glaives signs suggesting body-embedding effects
+Note: A fireball that could incidentally burn someone = PERMITTED. A spell specifically designed to destroy biological tissue = FORBIDDEN.
+
+VALIDATION:
+Set valid:false ONLY if there is no user-drawn ring AND no canonical sigil shapes AND no canonical sign shapes.
+Signs-only glyph (canonical sign shapes + ring but no elemental sigil) IS valid.
+
+RESPOND WITH ONLY THIS JSON, NO MARKDOWN FENCES, NO EXTRA TEXT:
+{
+  "valid": true or false,
+  "invalidReason": "specific reason if false, null if valid",
+  "glyphCount": number,
+  "glyphs": [{"sigil":"element name or Signs-Only","signs":["sign1","sign2"],"arrangement":"radial/bilateral/asymmetric","ringPresent":true or false,"ringQuality":"well-formed/rough/incomplete/absent"}],
+  "name": "Precise 2-5 word WHA-style spell name",
+  "element": "Fire|Water|Earth|Wind|Light|Arcane|Signs-Only|Multi",
+  "allElements": ["every element detected"],
+  "sigils_identified": "Exact description of what you observe in the center of each glyph",
+  "signs_identified": "Exact description of each surrounding mark and which WHA sign it represents",
+  "description": "2-3 sentences of exactly what this spell does physically in the world",
+  "missing_elements": "Specific actionable feedback on what is absent or imprecise. If complete, say so.",
+  "effect_type": "Combat|Utility|Movement|Environmental|Contraption|Forbidden|Compound",
+  "complexity": "Simple Glyph|Compound Seal|Linked Array|Nested Sigil|Forbidden Inscription",
+  "stability_note": "Specific observation about drawing quality and what real instability it would cause",
+  "ethics": "Permitted|Forbidden",
+  "ethics_reason": "Specific reason citing Day of the Pact rules",
+  "lore_note": "One sentence of in-world WHA lore about this class of spell"
+}`;
+
 // ═══════════ THEMES ═══════════
-// Transformed to historical, rich tones optimized for high contrast on light paper
 const TH = {
   Fire:  {c:'#b83a14',g:'#d95d32',bg:'#fbf5eb',pc:['#b83a14','#d95d32','#e08b46','rgba(184,58,20,.25)','#8a2207']},
   Water: {c:'#106ba3',g:'#2589c4',bg:'#f0f6fa',pc:['#106ba3','#2589c4','#5faedb','rgba(16,107,163,.2)','#0a466b']},
   Earth: {c:'#785420',g:'#966f38',bg:'#fcf9f2',pc:['#785420','#966f38','#b59257','rgba(120,84,32,.2)','#4f3410']},
   Wind:  {c:'#1c7343',g:'#2da161',bg:'#f2fbf5',pc:['#1c7343','#2da161','#6bc492','rgba(28,115,67,.2)','#0f4727']},
   Light: {c:'#a18c18',g:'#c4b033',bg:'#fffdf2',pc:['#a18c18','#c4b033','#e3d266','rgba(161,140,24,.15)','#6e5f0b']},
-  Arcane:{c:'#681da8',g:'#883ec4',bg:'#faf5ff',pc:['#681da8','#883ec4','#b070ebb','rgba(104,29,168,.2)','#430f70']},
-  Gold:  {c:'#2b2b2b',g:'#444444',bg:'#f4f1e3',pc:['#1a1a1a','#333333','#555555','rgba(0,0,0,0.1)','#000000']},
+  Arcane:{c:'#681da8',g:'#883ec4',bg:'#faf5ff',pc:['#681da8','#883ec4','#b070eb','rgba(104,29,168,.2)','#430f70']},
+  Gold:  {c:'#2b2b2b',g:'#444',   bg:'#f4f1e3',pc:['#1a1a1a','#333','#555','rgba(0,0,0,.1)','#000']},
 };
 
 function getTheme(el) {
@@ -260,14 +356,14 @@ const S = {
   sz:400, dpr:1, particles:[], fxId:null,
 };
 
-// ═══════════ DOM ═══════════
+// ═══════════ DOM REFS ═══════════
 const bgC = document.getElementById('bc');
 const drC = document.getElementById('dc');
 const fxC = document.getElementById('fc');
 const bgX = bgC.getContext('2d');
 const drX = drC.getContext('2d');
 const fxX = fxC.getContext('2d');
-const cw  = document.getElementById('cw');
+const cwEl = document.getElementById('cw');
 const rgEl = document.getElementById('rg');
 
 // ═══════════ RESIZE ═══════════
@@ -277,7 +373,7 @@ function resize() {
   const pad = 16;
   const sz = Math.max(200, Math.min(r.width - pad*2, r.height - pad*2, 820));
   S.sz = sz; S.dpr = Math.min(window.devicePixelRatio || 1, 3);
-  cw.style.width = sz+'px'; cw.style.height = sz+'px';
+  cwEl.style.width = sz+'px'; cwEl.style.height = sz+'px';
   [bgC,drC,fxC].forEach(c => {
     c.width = sz*S.dpr; c.height = sz*S.dpr;
     c.style.width = sz+'px'; c.style.height = sz+'px';
@@ -288,7 +384,7 @@ function resize() {
   drawBg(); redrawAll();
 }
 
-// ═══════════ BACKGROUND RING ═══════════
+// ═══════════ BACKGROUND ═══════════
 function drawBg() {
   const s=S.sz, cx=s/2, cy=s/2, r=s/2-18;
   bgX.clearRect(0,0,s,s);
@@ -309,14 +405,16 @@ function drawBg() {
     if (i%4===0) continue;
     const a=(i/32)*Math.PI*2-Math.PI/2;
     const rx=cx+(r+10)*Math.cos(a), ry=cy+(r+10)*Math.sin(a);
-    if(rx>3&&rx<s-3&&ry>3&&ry<s-3){bgX.beginPath();bgX.arc(rx,ry,1.1,0,Math.PI*2);bgX.fillStyle='rgba(26,26,26,.18)';bgX.fill();}
+    if(rx>3&&rx<s-3&&ry>3&&ry<s-3){
+      bgX.beginPath(); bgX.arc(rx,ry,1.1,0,Math.PI*2);
+      bgX.fillStyle='rgba(26,26,26,.18)'; bgX.fill();
+    }
   }
   bgX.strokeStyle='rgba(26,26,26,.08)'; bgX.lineWidth=.9; bgX.setLineDash([3,7]);
   bgX.beginPath(); bgX.arc(cx,cy,r*.55,0,Math.PI*2); bgX.stroke(); bgX.setLineDash([]);
   bgX.strokeStyle='rgba(26,26,26,.06)'; bgX.lineWidth=.9;
   bgX.beginPath(); bgX.moveTo(cx-15,cy); bgX.lineTo(cx+15,cy); bgX.stroke();
-  bgX.beginPath(); bgX.moveTo(cx,cy-15); bgX.lineTo(cx,cy+15);
-  bgX.stroke();
+  bgX.beginPath(); bgX.moveTo(cx,cy-15); bgX.lineTo(cx,cy+15); bgX.stroke();
 }
 
 // ═══════════ STROKE RENDERING ═══════════
@@ -336,17 +434,18 @@ function renderStroke(sk) {
     for(let i=1;i<pts.length;i++) drX.lineTo(pts[i].x*S.sz,pts[i].y*S.sz);
     drX.stroke(); drX.globalCompositeOperation='source-over'; return;
   }
-  drX.shadowColor='rgba(0,0,0,.05)';
-  drX.shadowBlur=2;
+  drX.shadowColor='rgba(0,0,0,.05)'; drX.shadowBlur=2;
   drX.strokeStyle='rgba(26,26,26,.95)';
   if (pts.length===2) {
     drX.lineWidth=1.5+((pts[0].p||.5)+(pts[1].p||.5))/2*3.2;
-    drX.beginPath(); drX.moveTo(pts[0].x*S.sz,pts[0].y*S.sz); drX.lineTo(pts[1].x*S.sz,pts[1].y*S.sz); drX.stroke();
+    drX.beginPath(); drX.moveTo(pts[0].x*S.sz,pts[0].y*S.sz);
+    drX.lineTo(pts[1].x*S.sz,pts[1].y*S.sz); drX.stroke();
     drX.shadowBlur=0; return;
   }
   let mpx=(pts[0].x+pts[1].x)/2, mpy=(pts[0].y+pts[1].y)/2;
   drX.lineWidth=1.5+(pts[0].p||.5)*3.2;
-  drX.beginPath(); drX.moveTo(pts[0].x*S.sz,pts[0].y*S.sz); drX.lineTo(mpx*S.sz,mpy*S.sz); drX.stroke();
+  drX.beginPath(); drX.moveTo(pts[0].x*S.sz,pts[0].y*S.sz);
+  drX.lineTo(mpx*S.sz,mpy*S.sz); drX.stroke();
   for (let i=1;i<pts.length-1;i++) {
     const p0=pts[i], p1=pts[i+1];
     const nmpx=(p0.x+p1.x)/2, nmpy=(p0.y+p1.y)/2;
@@ -357,7 +456,8 @@ function renderStroke(sk) {
   }
   const lp=pts[pts.length-1];
   drX.lineWidth=1.5+(lp.p||.5)*3.2;
-  drX.beginPath(); drX.moveTo(mpx*S.sz,mpy*S.sz); drX.lineTo(lp.x*S.sz,lp.y*S.sz); drX.stroke();
+  drX.beginPath(); drX.moveTo(mpx*S.sz,mpy*S.sz);
+  drX.lineTo(lp.x*S.sz,lp.y*S.sz); drX.stroke();
   drX.shadowBlur=0;
 }
 
@@ -368,7 +468,8 @@ function drawLive(p0,p1,eraser,pres) {
   drX.beginPath();
   drX.moveTo(p0.x*S.sz,p0.y*S.sz); drX.lineTo(p1.x*S.sz,p1.y*S.sz);
   if (eraser) {
-    drX.globalCompositeOperation='destination-out'; drX.strokeStyle='rgba(0,0,0,1)'; drX.stroke();
+    drX.globalCompositeOperation='destination-out';
+    drX.strokeStyle='rgba(0,0,0,1)'; drX.stroke();
     drX.globalCompositeOperation='source-over';
   } else {
     drX.shadowColor='rgba(0,0,0,.05)'; drX.shadowBlur=2;
@@ -422,7 +523,10 @@ drC.addEventListener('pointercancel',e=>{
   S.cur=null; prevPt=null;
 });
 
-function norm(e){const r=drC.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height};}
+function norm(e){
+  const r=drC.getBoundingClientRect();
+  return{x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height};
+}
 function setP(p){document.getElementById('pbf').style.width=((p||.5)*100)+'%';}
 
 // ═══════════ CIRCLE DETECTION ═══════════
@@ -444,7 +548,8 @@ function detectCircles(){
     const round=Math.max(0,1-cv*2.6);
     const score=round*.65+closed*.35;
     if(score>.2&&mr>8){
-      const dup=found.some(c=>Math.abs(c.cx-cx)*S.sz<22&&Math.abs(c.cy-cy)*S.sz<22&&Math.abs(c.mr-mr)<16);
+      const dup=found.some(c=>
+        Math.abs(c.cx-cx)*S.sz<22&&Math.abs(c.cy-cy)*S.sz<22&&Math.abs(c.mr-mr)<16);
       if(!dup) found.push({cx,cy,mr,round,closed,score});
     }
   }
@@ -453,12 +558,15 @@ function detectCircles(){
 
 // ═══════════ ACCURACY ANALYSIS ═══════════
 function analyzeAccuracy(circles,forceZero){
-  if(forceZero) return{strokePurity:0,sealBalance:0,ringPrecision:0,lineConf:0,potency:0,hasRing:false,
-    grade:{l:'Unformed Scrawl',d:'No recognizable WHA sigils, signs, or ring detected. Draw canonical shapes and close your ring.'}};
+  if(forceZero) return{
+    strokePurity:0,sealBalance:0,ringPrecision:0,lineConf:0,potency:0,hasRing:false,
+    grade:{l:'Unformed Scrawl',d:'No recognizable WHA sigils, signs, or ring detected. Draw canonical shapes and close your ring.'}
+  };
   const ink=S.strokes.filter(s=>!s.eraser&&s.pts.length>1);
   if(!ink.length) return null;
   const all=ink.flatMap(s=>s.pts);
-  
+
+  // Stroke Purity — angular jitter
   let jS=0,jN=0;
   for(const sk of ink){
     const pts=sk.pts;
@@ -473,16 +581,23 @@ function analyzeAccuracy(circles,forceZero){
     }
   }
   const strokePurity=Math.round(Math.max(0,Math.min(100,(1-(jN>0?jS/jN:0)/.52)*100)));
+
+  // Seal Balance — 8-sector distribution
   const bcx=all.reduce((s,p)=>s+p.x,0)/all.length;
   const bcy=all.reduce((s,p)=>s+p.y,0)/all.length;
   const sec=new Array(8).fill(0);
-  for(const p of all) sec[Math.floor(((Math.atan2(p.y-bcy,p.x-bcx)+Math.PI)/(Math.PI*2))*8)%8]++;
+  for(const p of all)
+    sec[Math.floor(((Math.atan2(p.y-bcy,p.x-bcx)+Math.PI)/(Math.PI*2))*8)%8]++;
   const bm=sec.reduce((a,b)=>a+b,0)/8;
   const bcv=bm>0?Math.sqrt(sec.reduce((s,v)=>s+(v-bm)**2,0)/8)/bm:1;
   const sealBalance=Math.round(Math.max(0,Math.min(100,(1-Math.min(bcv,1.4)/1.4)*100)));
+
+  // Ring Precision
   const best=circles.length>0?circles[0]:null;
   const ringPrecision=best?Math.round(best.score*100):0;
   const hasRing=ringPrecision>=18;
+
+  // Line Confidence — perpendicular deviation (speed-independent)
   const lcScores=[];
   const W=8, step=Math.max(1,Math.floor(W/2));
   for(const sk of ink){
@@ -501,29 +616,34 @@ function analyzeAccuracy(circles,forceZero){
       lcScores.push(Math.max(0,1-(maxP/wl)*5));
     }
   }
-  const lineConf=lcScores.length>0?Math.round(lcScores.reduce((a,b)=>a+b)/lcScores.length*100):75;
-  const potency=hasRing ?Math.round(.27*strokePurity+.24*sealBalance+.25*ringPrecision+.24*lineConf) :Math.round((.38*strokePurity+.32*sealBalance+.30*lineConf)*.38);
+  const lineConf=lcScores.length>0
+    ?Math.round(lcScores.reduce((a,b)=>a+b)/lcScores.length*100):75;
+
+  const potency=hasRing
+    ?Math.round(.27*strokePurity+.24*sealBalance+.25*ringPrecision+.24*lineConf)
+    :Math.round((.38*strokePurity+.32*sealBalance+.30*lineConf)*.38);
+
   return{strokePurity,sealBalance,ringPrecision,lineConf,potency,hasRing,grade:gradeOf(potency)};
 }
 
 function gradeOf(p){
-  if(p>90)return{l:'Master Sigil',d:'A transcendent inscription. Your precision rivals the Three Wise themselves.'};
-  if(p>74)return{l:'Expert Seal',d:'Practiced and confident. Worthy of a senior Pointed Hat apprentice.'};
-  if(p>54)return{l:'Journeyman Mark',d:'Functional — though imperfections may shorten the spell\'s duration or potency.'};
-  if(p>34)return{l:'Apprentice Scratch',d:'Rough and trembling. The spell may misfire or lose power unpredictably.'};
+  if(p>=90)return{l:'Master Sigil',d:'A transcendent inscription. Your precision rivals the Three Wise themselves.'};
+  if(p>=74)return{l:'Expert Seal',d:'Practiced and confident. Worthy of a senior Pointed Hat apprentice.'};
+  if(p>=54)return{l:'Journeyman Mark',d:'Functional — though imperfections may shorten the spell\'s duration or potency.'};
+  if(p>=34)return{l:'Apprentice Scratch',d:'Rough and trembling. The spell may misfire or lose power unpredictably.'};
   return{l:'Unformed Scrawl',d:'The conjuring ink barely recognizes this shape. Begin again with a steadier hand.'};
 }
 
 // ═══════════ PARTICLES ═══════════
-class Pt {
+class Ptcl {
   constructor(x,y,cols,el){
-    this.x=x;this.y=y;this.el=(el||'arcane').toLowerCase();
+    this.x=x; this.y=y; this.el=(el||'arcane').toLowerCase();
     this.col=cols[Math.floor(Math.random()*cols.length)];
-    const spd=1.8+Math.random()*5,ang=Math.random()*Math.PI*2;
-    this.vx=Math.cos(ang)*spd;this.vy=Math.sin(ang)*spd;
-    this.life=0;this.maxL=55+Math.random()*100;
+    const spd=1.8+Math.random()*5, ang=Math.random()*Math.PI*2;
+    this.vx=Math.cos(ang)*spd; this.vy=Math.sin(ang)*spd;
+    this.life=0; this.maxL=55+Math.random()*100;
     this.sz=1.8+Math.random()*4.5;
-    this.rot=Math.random()*Math.PI*2;this.rS=(Math.random()-.5)*.3;
+    this.rot=Math.random()*Math.PI*2; this.rS=(Math.random()-.5)*.3;
   }
   tick(){
     this.life++;
@@ -531,7 +651,8 @@ class Pt {
     if(e.includes('fire')){this.vy-=.08;this.vx+=(Math.random()-.5)*.25;}
     else if(e.includes('water')){this.vy+=.04;this.vx+=(Math.random()-.5)*.4;}
     else if(e.includes('wind')){this.vx+=Math.sin(this.life*.15)*.35;this.vy-=.03;}
-    this.x+=this.vx;this.y+=this.vy;this.vx*=.96;this.vy*=.96;this.rot+=this.rS;
+    this.x+=this.vx; this.y+=this.vy;
+    this.vx*=.96; this.vy*=.96; this.rot+=this.rS;
   }
   draw(ctx){
     const alpha=Math.max(0,1-this.life/this.maxL);
@@ -540,7 +661,8 @@ class Pt {
     if(this.el.includes('fire')||this.el.includes('light')){
       ctx.shadowColor=this.col; ctx.shadowBlur=6;
     }
-    ctx.fillRect(-this.sz/2,-this.sz/2,this.sz,this.sz); ctx.restore();
+    ctx.fillRect(-this.sz/2,-this.sz/2,this.sz,this.sz);
+    ctx.restore();
   }
 }
 
@@ -549,17 +671,18 @@ function spawnFx(el,circles){
   if(circles&&circles.length>0){
     const c=circles[0];
     for(let a=0;a<Math.PI*2;a+=.045){
-      if(Math.random()>.45)continue;
-      const px=c.cx*S.sz+c.mr*Math.cos(a), py=c.cy*S.sz+c.mr*Math.sin(a);
-      S.particles.push(new Pt(px,py,t.pc,el));
+      if(Math.random()>.45) continue;
+      const px=c.cx*S.sz+c.mr*Math.cos(a);
+      const py=c.cy*S.sz+c.mr*Math.sin(a);
+      S.particles.push(new Ptcl(px,py,t.pc,el));
     }
-  }else{
+  } else {
     const ink=S.strokes.filter(s=>!s.eraser);
     if(ink.length>0){
       for(let i=0;i<60;i++){
         const sk=ink[Math.floor(Math.random()*ink.length)];
         const pt=sk.pts[Math.floor(Math.random()*sk.pts.length)];
-        S.particles.push(new Pt(pt.x*S.sz,pt.y*S.sz,t.pc,el));
+        S.particles.push(new Ptcl(pt.x*S.sz,pt.y*S.sz,t.pc,el));
       }
     }
   }
@@ -575,15 +698,16 @@ function loopFx(){
   if(S.particles.length>0) S.fxId=requestAnimationFrame(loopFx);
 }
 
-// ═══════════ STATE HANDLER ═══════════
+// ═══════════ STATE ═══════════
 function setState(st){
   document.getElementById('st-e').style.display=st==='e'?'flex':'none';
-  document.getElementById('st-l').style.display=st==='loading'?'flex':'none';
-  document.getElementById('st-r').style.display=st==='result'?'block':'none';
+  document.getElementById('st-l').style.display=st==='l'?'flex':'none';
+  document.getElementById('st-r').style.display=st==='r'?'block':'none';
 }
 
-function applyTheme(thName){
-  const t=getTheme(thName);
+// ═══════════ THEME ═══════════
+function applyTheme(el){
+  const t=getTheme(el);
   document.body.style.background=t.bg;
   document.getElementById('ca').style.background=t.bg;
   rgEl.style.boxShadow=`0 0 35px ${t.c}25`;
@@ -596,85 +720,156 @@ function resetTheme(){
   rgEl.style.boxShadow=''; rgEl.style.background='';
 }
 
-// ═══════════ FIXED CAST GLYPH (AI LEGIBILITY FIX) ═══════════
+// ═══════════ RENDER RESULT ═══════════
+function renderResult(spell, acc){
+  // Show result panel
+  setState('r');
+  const resEl=document.getElementById('st-r');
+  resEl.classList.remove('rev'); void resEl.offsetWidth; resEl.classList.add('rev');
+
+  const inv = !spell || spell.valid === false;
+
+  // Invalid panel
+  document.getElementById('inv-p').style.display = inv ? 'block' : 'none';
+  if(inv){
+    document.getElementById('inv-w').textContent =
+      (spell && spell.invalidReason) ||
+      'No recognizable WHA sigils, signs, or user-drawn ring detected. Draw canonical shapes inside a closed ring.';
+  }
+
+  // Accuracy scores (always shown)
+  if(acc){
+    setTimeout(()=>{
+      setSc('sm', acc.strokePurity);
+      setSc('ba', acc.sealBalance);
+      setSc('rp', acc.ringPrecision);
+      setSc('lc', acc.lineConf);
+      setSc('po', acc.potency);
+      document.getElementById('r-g').textContent  = acc.grade.l;
+      document.getElementById('r-gd').textContent = acc.grade.d;
+    }, 80);
+  }
+
+  // Ethics badge
+  const ethW = document.getElementById('eth-w');
+  if(!inv && spell && spell.ethics){
+    ethW.style.display = 'block';
+    const isForbidden = spell.ethics === 'Forbidden';
+    const ebox = document.getElementById('ebox');
+    ebox.className = 'ebox ' + (isForbidden ? 'f' : 'p');
+    document.getElementById('eico').textContent = isForbidden ? '🚫' : '✅';
+    const elblEl = document.getElementById('elbl');
+    elblEl.textContent = isForbidden ? 'Forbidden Magic' : 'Permitted Magic';
+    elblEl.className = 'elbl ' + (isForbidden ? 'f' : 'p');
+    document.getElementById('ersn').textContent = spell.ethics_reason || '';
+  } else {
+    ethW.style.display = 'none';
+  }
+
+  // Spell identification panel
+  const spP = document.getElementById('sp-p');
+  spP.style.display = inv ? 'none' : 'block';
+
+  if(!inv && spell){
+    // Tags
+    const tags = document.getElementById('r-tags');
+    tags.innerHTML = '';
+    [spell.element, spell.effect_type, spell.complexity,
+      spell.glyphCount > 1 ? spell.glyphCount + ' Glyphs' : null
+    ].filter(Boolean).forEach(t=>{
+      const s=document.createElement('span');
+      s.className='tag'; s.textContent=t; tags.appendChild(s);
+    });
+
+    document.getElementById('r-name').textContent = spell.name || 'Unnamed Glyph';
+    document.getElementById('r-desc').textContent = spell.description || '—';
+
+    const lines=[];
+    if(spell.sigils_identified) lines.push('Sigil  →  '+spell.sigils_identified);
+    if(spell.signs_identified)  lines.push('Signs  →  '+spell.signs_identified);
+    if(spell.stability_note)    lines.push(spell.stability_note);
+    document.getElementById('r-parts').textContent = lines.join('\n\n');
+
+    const missEl = document.getElementById('r-miss');
+    const miss = spell.missing_elements || '';
+    if(miss.length > 2 && !/^(n\/a|none|complete|well.formed)/i.test(miss)){
+      missEl.style.display='block';
+      missEl.textContent='⚠ '+miss;
+    } else {
+      missEl.style.display='none';
+    }
+
+    const loreEl = document.getElementById('r-lore');
+    if(spell.lore_note && spell.lore_note.length > 3){
+      loreEl.style.display='block';
+      loreEl.textContent='"'+spell.lore_note+'"';
+    } else {
+      loreEl.style.display='none';
+    }
+  }
+}
+
+function setSc(id, val){
+  const v=Math.max(0,Math.min(100,Math.round(val||0)));
+  const f=document.getElementById('b'+id);
+  const n=document.getElementById('n'+id);
+  if(f) f.style.width=v+'%';
+  if(n) n.textContent=v;
+}
+
+// ═══════════ CAST GLYPH ═══════════
 async function castGlyph() {
   if (!S.hasDrawn || S.loading) return;
-  
   S.loading = true;
-  setState('loading');
-  
-  // 1. Instantiating a new internal off-screen layer matching the bounding viewport layout
+  setState('l');
+
+  // Build composite image on white background
   const offCanvas = document.createElement('canvas');
   offCanvas.width = S.sz * S.dpr;
   offCanvas.height = S.sz * S.dpr;
   const offCtx = offCanvas.getContext('2d');
   offCtx.scale(S.dpr, S.dpr);
-  
-  // 2. Painting a solid paper background to guarantee the Vision AI doesn't render transparent pixels as pitch black
   offCtx.fillStyle = '#f4f1e3';
   offCtx.fillRect(0, 0, S.sz, S.sz);
-  
-  // 3. Composite layer drawings down sequentially 
   offCtx.drawImage(bgC, 0, 0, S.sz, S.sz);
   offCtx.drawImage(drC, 0, 0, S.sz, S.sz);
-  
-  // 4. Compress to a standard high-contrast Image String format
+
+  // base64Image — full data URL including prefix
   const base64Image = offCanvas.toDataURL('image/jpeg', 0.9);
-  
-  // Check geometry locally first
+
   const circles = detectCircles();
   const acc = analyzeAccuracy(circles, false);
-  
+
   try {
-    // 5. Send payload containing base64 data URL to your backend API route
-    const WORKER_URL = 'https://little-meadow-ac51.noahallem4.workers.dev/';
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image: base64Image,
+        prompt: PROMPT
+      })
+    });
 
-const res = await fetch(WORKER_URL, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    image: base64,
-    prompt: PROMPT
-  })
-});
+    if (!res.ok) throw new Error('Worker returned status ' + res.status);
 
-const raw = await res.text();
-const spell = JSON.parse(raw.replace(/```json|```/g, '').trim());
-    
-  renderResult(spell, acc);
-applyTheme(spell.element, spell.allElements);
-spawnFx(spell.element, circles);
-    
-    
- } catch (err) {
-  console.error(err);
-  renderResult({
-    valid: false,
-    invalidReason: 'Connection to the Great Library failed. Check your connection and try again.'
-  }, acc);
-  resetTheme();
-} finally {
-  S.loading = false;
+    const raw = await res.text();
+    const spell = JSON.parse(raw.replace(/```json|```/g, '').trim());
+
+    renderResult(spell, acc);
+    applyTheme(spell.element || 'Arcane');
+    spawnFx(spell.element || 'Arcane', circles);
+
+  } catch (err) {
+    console.error('Cast error:', err);
+    renderResult({
+      valid: false,
+      invalidReason: 'Connection to the Great Library failed. Check your connection and try again. (' + err.message + ')'
+    }, acc);
+    resetTheme();
+  } finally {
+    S.loading = false;
+  }
 }
-
-function showUnreadable(msg) {
-  document.getElementById('inv-p').style.display = 'block';
-  document.getElementById('sp-p').style.display = 'none';
-  document.getElementById('inv-w').innerText = msg;
-  
-  const acc = analyzeAccuracy(detectCircles(), true);
-  document.getElementById('r-g').innerText = acc.grade.l;
-  document.getElementById('r-gd').innerText = acc.grade.d;
-  document.getElementById('bsm').style.width = '0%'; document.getElementById('nsm').innerText = '0';
-  document.getElementById('bba').style.width = '0%'; document.getElementById('nba').innerText = '0';
-  document.getElementById('brp').style.width = '0%'; document.getElementById('nrp').innerText = '0';
-  document.getElementById('blc').style.width = '0%'; document.getElementById('nlc').innerText = '0';
-  document.getElementById('bpo').style.width = '0%'; document.getElementById('npo').innerText = '0';
-  
-  resetTheme();
-  setState('result');
-}
-
 // ═══════════ CONTROLS ═══════════
 document.getElementById('btn-p').addEventListener('click',()=>{
   S.tool='pen';
@@ -682,14 +877,16 @@ document.getElementById('btn-p').addEventListener('click',()=>{
   document.getElementById('btn-e').classList.remove('on');
   drC.style.cursor='crosshair';
 });
+
 document.getElementById('btn-e').addEventListener('click',()=>{
   S.tool='eraser';
   document.getElementById('btn-e').classList.add('on');
   document.getElementById('btn-p').classList.remove('on');
   drC.style.cursor='cell';
 });
+
 document.getElementById('btn-c').addEventListener('click',()=>{
-  S.strokes=[];S.cur=null;S.hasDrawn=false;S.loading=false;
+  S.strokes=[]; S.cur=null; S.hasDrawn=false; S.loading=false;
   S.particles=[];
   if(S.fxId){cancelAnimationFrame(S.fxId);S.fxId=null;}
   drX.clearRect(0,0,S.sz,S.sz);
@@ -697,10 +894,12 @@ document.getElementById('btn-c').addEventListener('click',()=>{
   document.getElementById('btn-cast').disabled=true;
   setState('e'); resetTheme();
 });
-document.getElementById('btn-cast').addEventListener('click',castGlyph);
 
-window.addEventListener('resize',resize);
-document.addEventListener('DOMContentLoaded',()=>{ resize(); });
+document.getElementById('btn-cast').addEventListener('click', castGlyph);
+
+window.addEventListener('resize', resize);
+document.addEventListener('DOMContentLoaded', ()=>{ resize(); });
+resize();
 </script>
 </body>
 </html>
