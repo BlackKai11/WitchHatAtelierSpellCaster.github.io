@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Glyph Caster">
 <title>Witch Hat Atelier — Glyph Caster</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --gold:#c9a84c;--gl:#f0d080;--gd:#7a5e28;
-  --bg:#06060f;--sf:#0b0b1a;--br:rgba(201,168,76,.22);
-  --tx:#cfc0a0;--td:#5a4e36;
-  --el:#c9a84c;--eg:#f0d080;--eb:#06060f;
+  --gold:#3a3a3a;--gl:#555555;--gd:#111111;
+  --bg:#f4f1e3;--sf:#eae6d0;--br:rgba(26,26,26,.18);
+  --tx:#2b2b2b;--td:#5e584a;
+  --el:#1a1a1a;--eg:#2c2c2c;--eb:#f4f1e3;
   --ff:'Palatino Linotype','Book Antiqua',Palatino,serif;
 }
 html,body{width:100%;height:100%;overflow:hidden;background:var(--eb);font-family:var(--ff);
@@ -32,9 +32,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--eb);font-famil
 /* Header */
 #hdr{display:flex;align-items:center;justify-content:space-between;
   padding:.6rem 1rem;border-bottom:1px solid var(--br);
-  background:rgba(6,6,15,.93);backdrop-filter:blur(14px);z-index:30;transition:border-color 1s}
+  background:rgba(244,241,227,.93);backdrop-filter:blur(14px);z-index:30;transition:border-color 1s}
 .hs{font-size:.58rem;letter-spacing:.32em;text-transform:uppercase;color:var(--el);font-weight:700;transition:color 1s}
-.ht{font-size:1.05rem;color:var(--eg);letter-spacing:.07em;text-shadow:0 0 16px var(--el);font-weight:500;transition:all 1s}
+.ht{font-size:1.05rem;color:var(--eg);letter-spacing:.07em;text-shadow:0 0 16px rgba(0,0,0,.05);font-weight:500;transition:all 1s}
 .pbadge{font-size:.62rem;letter-spacing:.06em;color:var(--td);font-weight:700;
   padding:.22rem .55rem;border:1px solid var(--br);border-radius:3px;
   display:none;align-items:center;gap:.28rem}
@@ -42,18 +42,20 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--eb);font-famil
 .pbd{width:6px;height:6px;border-radius:50%;background:var(--el);box-shadow:0 0 5px var(--el);animation:blink 1.4s ease infinite}
 /* Canvas area */
 #ca{position:relative;display:flex;align-items:center;justify-content:center;
-  overflow:hidden;background:var(--eb);transition:background 1.2s}
+  overflow:hidden;background:var(--eb);transition:background 1.2s;
+  background-image: radial-gradient(rgba(0,0,0,0.03) 1px, transparent 0);
+  background-size: 24px 24px;}
 #cw{position:relative;border-radius:50%;flex-shrink:0}
 #bc,#dc,#fc{position:absolute;top:0;left:0;border-radius:50%}
 #bc{z-index:1;pointer-events:none}
 #fc{z-index:3;pointer-events:none}
 #dc{z-index:2;touch-action:none;cursor:crosshair}
 #rg{position:absolute;inset:-22px;border-radius:50%;pointer-events:none;z-index:0;
-  transition:box-shadow 1.2s,background 1.2s;box-shadow:0 0 20px rgba(201,168,76,.08)}
+  transition:box-shadow 1.2s,background 1.2s;box-shadow:0 0 20px rgba(26,26,26,.04)}
 /* Toolbar */
 #tb{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;
   gap:.4rem;padding:.6rem .8rem;min-height:58px;
-  border-top:1px solid var(--br);background:rgba(6,6,15,.94);
+  border-top:1px solid var(--br);background:rgba(244,241,227,.94);
   backdrop-filter:blur(14px);z-index:20;transition:border-color 1s}
 .btn{padding:.5rem .95rem;min-height:44px;
   border:1px solid var(--br);background:transparent;
@@ -61,13 +63,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--eb);font-famil
   letter-spacing:.06em;border-radius:4px;cursor:pointer;
   transition:all .2s;-webkit-tap-highlight-color:transparent;white-space:nowrap;
   display:flex;align-items:center;justify-content:center}
-.btn:active,.btn.on{background:var(--el);color:#06060f;border-color:var(--el)}
+.btn:active,.btn.on{background:var(--el);color:#f4f1e3;border-color:var(--el)}
 .cast-btn{padding:.5rem 1.8rem;min-height:44px;
   border:1px solid var(--el);
-  background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(240,208,128,.2));
+  background:linear-gradient(135deg,rgba(26,26,26,.05),rgba(26,26,26,.1));
   color:var(--eg);font-family:var(--ff);font-size:.88rem;font-weight:700;
   letter-spacing:.12em;border-radius:4px;cursor:pointer;
-  transition:all .3s;box-shadow:0 0 12px rgba(201,168,76,.12);
+  transition:all .3s;box-shadow:0 0 12px rgba(26,26,26,.05);
   -webkit-tap-highlight-color:transparent;white-space:nowrap;
   display:flex;align-items:center;justify-content:center}
 .cast-btn:disabled{opacity:.3;cursor:default;box-shadow:none;border-color:var(--br);color:var(--td);background:transparent}
@@ -75,7 +77,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--eb);font-famil
 .pbw{display:none;align-items:center;gap:.4rem;min-height:44px}
 .pbw.on{display:flex}
 .pbl{font-size:.62rem;color:var(--td);font-weight:700;letter-spacing:.04em;white-space:nowrap}
-.pbb{width:55px;height:2px;background:rgba(255,255,255,.06);border-radius:1px}
+.pbb{width:55px;height:2px;background:rgba(0,0,0,.08);border-radius:1px}
 .pbf{height:100%;border-radius:1px;background:var(--el);transition:width .08s}
 /* Sidebar */
 #sb{background:var(--sf);border-top:1px solid var(--br);
@@ -88,48 +90,48 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--eb);font-famil
 #sb::-webkit-scrollbar-thumb{background:var(--br);border-radius:2px}
 /* States */
 .sc{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;padding:1.2rem 0}
-.stxt{font-size:.8rem;color:var(--gold);text-align:center;line-height:1.8;letter-spacing:.06em;opacity:.4;font-weight:600}
+.stxt{font-size:.8rem;color:var(--tx);text-align:center;line-height:1.8;letter-spacing:.06em;opacity:.6;font-weight:600}
 .sp{animation:spin 3s linear infinite}
 .sr{animation:spin 2s linear infinite reverse;transform-origin:center}
 .sec{font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:var(--el);
   border-bottom:1px solid var(--br);padding-bottom:.3rem;font-weight:700;transition:color 1s,border-color 1s}
 /* Grade */
 .gb{border:1px solid var(--br);border-radius:5px;padding:.62rem .82rem;text-align:center;
-  background:rgba(201,168,76,.04);transition:border-color 1s}
+  background:rgba(26,26,26,.03);transition:border-color 1s}
 .gl{font-size:1rem;color:var(--eg);letter-spacing:.05em;font-weight:600;transition:color 1s}
 .gd{font-size:.72rem;color:var(--td);margin-top:.25rem;line-height:1.6;font-style:italic;font-weight:600}
 /* Score rows */
 .srow{display:flex;align-items:center;gap:.55rem;margin-top:.38rem}
 .slbl{font-size:.69rem;color:var(--td);letter-spacing:.03em;width:114px;flex-shrink:0;font-weight:700}
-.sbar{flex:1;height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden}
+.sbar{flex:1;height:3px;background:rgba(0,0,0,.06);border-radius:2px;overflow:hidden}
 .sfil{height:100%;border-radius:2px;transition:width 1.4s cubic-bezier(.4,0,.2,1);
   background:linear-gradient(to right,var(--gd),var(--el))}
 .snum{font-size:.73rem;color:var(--el);width:26px;text-align:right;font-weight:800}
-#bpot .sfil{background:linear-gradient(to right,var(--gd),var(--el),var(--eg))}
+#bpot .sfil{background:linear-gradient(to right,var(--gd),var(--el),var(--gl))}
 /* Ethics */
 .ebox{display:flex;align-items:flex-start;gap:.65rem;border-radius:5px;padding:.65rem .82rem;border:1px solid;transition:all .5s}
-.ebox.p{border-color:rgba(80,210,100,.42);background:rgba(40,180,60,.06)}
-.ebox.f{border-color:rgba(255,70,70,.42);background:rgba(220,30,30,.06)}
+.ebox.p{border-color:rgba(40,160,60,.42);background:rgba(40,160,60,.06)}
+.ebox.f{border-color:rgba(200,30,30,.42);background:rgba(200,30,30,.06)}
 .eico{font-size:1.3rem;line-height:1;flex-shrink:0;margin-top:.05rem}
 .elbl{font-size:.9rem;font-weight:700;letter-spacing:.05em;margin-bottom:.2rem}
-.elbl.p{color:#60e080}
-.elbl.f{color:#ff6060}
+.elbl.p{color:#278a3e}
+.elbl.f{color:#b82525}
 .ersn{font-size:.71rem;color:var(--td);line-height:1.62;font-style:italic;font-weight:600}
 /* Invalid */
-.inv-b{border:1px solid rgba(255,60,60,.38);border-radius:4px;padding:.65rem .82rem;background:rgba(255,20,20,.05)}
-.inv-t{font-size:.84rem;color:#ff7070;font-weight:700;letter-spacing:.05em}
-.inv-d{font-size:.72rem;color:#9a4444;margin-top:.28rem;line-height:1.6;font-weight:600}
+.inv-b{border:1px solid rgba(200,30,30,.38);border-radius:4px;padding:.65rem .82rem;background:rgba(200,30,30,.05)}
+.inv-t{font-size:.84rem;color:#b82525;font-weight:700;letter-spacing:.05em}
+.inv-d{font-size:.72rem;color:#7a1f1f;margin-top:.28rem;line-height:1.6;font-weight:600}
 /* Spell result */
 .tagr{display:flex;gap:.28rem;flex-wrap:wrap}
 .tag{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--el);
   border:1px solid currentColor;border-radius:2px;padding:.1rem .4rem;transition:color 1s;font-weight:700}
 .snm{font-size:1.46rem;color:var(--eg);letter-spacing:.04em;font-weight:500;line-height:1.2;
-  text-shadow:0 0 18px var(--el);transition:all 1s}
+  text-shadow:0 0 18px rgba(0,0,0,.02);transition:all 1s}
 .dvd{height:1px;background:linear-gradient(to right,var(--el) 35%,transparent);margin:.05rem 0;transition:background 1s}
 .sdesc{font-size:.84rem;line-height:1.82;color:var(--tx);font-style:italic;font-weight:500}
 .sparts{font-size:.72rem;line-height:1.68;color:var(--td);border-top:1px solid var(--br);
   padding-top:.58rem;font-weight:600;white-space:pre-line}
-.smiss{font-size:.72rem;line-height:1.62;color:#c08858;border-top:1px dashed rgba(200,150,70,.28);
+.smiss{font-size:.72rem;line-height:1.62;color:#a06030;border-top:1px dashed rgba(26,26,26,.15);
   padding-top:.52rem;font-style:italic;font-weight:600}
 .slore{font-size:.72rem;line-height:1.62;color:var(--td);border-top:1px solid var(--br);
   padding-top:.52rem;font-style:italic;font-weight:500}
@@ -159,22 +161,22 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--eb);font-famil
 </div>
 <div id="sb">
   <div class="sc" id="st-e">
-    <svg width="52" height="52" viewBox="0 0 52 52" opacity=".4">
-      <circle cx="26" cy="26" r="22" fill="none" stroke="#c9a84c" stroke-width="1.3" stroke-dasharray="4.5 3.5"/>
-      <circle cx="26" cy="26" r="12.5" fill="none" stroke="#c9a84c" stroke-width=".8" stroke-dasharray="3 3" opacity=".5"/>
-      <circle cx="26" cy="26" r="3.5" fill="#c9a84c" opacity=".75"/>
-      <line x1="26" y1="13.5" x2="26" y2="10" stroke="#c9a84c" stroke-width="1.8"/>
-      <line x1="26" y1="38.5" x2="26" y2="42" stroke="#c9a84c" stroke-width="1.8"/>
-      <line x1="13.5" y1="26" x2="10" y2="26" stroke="#c9a84c" stroke-width="1.8"/>
-      <line x1="38.5" y1="26" x2="42" y2="26" stroke="#c9a84c" stroke-width="1.8"/>
+    <svg width="52" height="52" viewBox="0 0 52 52" opacity=".6">
+      <circle cx="26" cy="26" r="22" fill="none" stroke="#1a1a1a" stroke-width="1.3" stroke-dasharray="4.5 3.5"/>
+      <circle cx="26" cy="26" r="12.5" fill="none" stroke="#1a1a1a" stroke-width=".8" stroke-dasharray="3 3" opacity=".5"/>
+      <circle cx="26" cy="26" r="3.5" fill="#1a1a1a" opacity=".75"/>
+      <line x1="26" y1="13.5" x2="26" y2="10" stroke="#1a1a1a" stroke-width="1.8"/>
+      <line x1="26" y1="38.5" x2="26" y2="42" stroke="#1a1a1a" stroke-width="1.8"/>
+      <line x1="13.5" y1="26" x2="10" y2="26" stroke="#1a1a1a" stroke-width="1.8"/>
+      <line x1="38.5" y1="26" x2="42" y2="26" stroke="#1a1a1a" stroke-width="1.8"/>
     </svg>
     <div class="stxt">Draw your sigil, signs &amp; ring inside the circle<br>then tap Cast Glyph</div>
   </div>
   <div class="sc" id="st-l" style="display:none">
     <svg width="48" height="48" viewBox="0 0 48 48" class="sp">
-      <circle cx="24" cy="24" r="20" fill="none" stroke="#c9a84c" stroke-width="1.2" stroke-dasharray="7 4.5" opacity=".5"/>
-      <circle cx="24" cy="24" r="12" fill="none" stroke="#f0d080" stroke-width=".9" stroke-dasharray="3.5 4" opacity=".35" class="sr"/>
-      <circle cx="24" cy="24" r="3.2" fill="#c9a84c"/>
+      <circle cx="24" cy="24" r="20" fill="none" stroke="#1a1a1a" stroke-width="1.2" stroke-dasharray="7 4.5" opacity=".5"/>
+      <circle cx="24" cy="24" r="12" fill="none" stroke="#555555" stroke-width=".9" stroke-dasharray="3.5 4" opacity=".35" class="sr"/>
+      <circle cx="24" cy="24" r="3.2" fill="#1a1a1a"/>
     </svg>
     <div class="stxt" style="opacity:1;animation:pulse 1.8s ease infinite;font-weight:700">Consulting the Great Library…</div>
   </div>
@@ -229,14 +231,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--eb);font-famil
 'use strict';
 
 // ═══════════ THEMES ═══════════
+// Transformed to historical, rich tones optimized for high contrast on light paper
 const TH = {
-  Fire:  {c:'#ff6a3d',g:'#ffb060',bg:'#120300',pc:['#ff6a3d','#ff9f1c','#ffcc02','rgba(255,190,80,.55)','#ff4500']},
-  Water: {c:'#3dbdff',g:'#90e8ff',bg:'#00101e',pc:['#00b4d8','#90e0ef','#caf0f8','rgba(130,220,255,.5)','#0077b6']},
-  Earth: {c:'#c8a060',g:'#e8c880',bg:'#0e0700',pc:['#8b5e3c','#a07850','#6b8f47','rgba(190,160,80,.5)','#5c4033']},
-  Wind:  {c:'#a8ffd0',g:'#d8ffe8',bg:'#001a08',pc:['#a8ffd0','#d0ffe8','rgba(190,255,215,.5)','#ffffff','#b2ffce']},
-  Light: {c:'#fff8c0',g:'#ffffff', bg:'#141200',pc:['#ffffff','rgba(255,253,220,.92)','rgba(255,245,140,.7)','rgba(240,215,70,.45)','#ffe57f']},
-  Arcane:{c:'#c960ff',g:'#f0a0ff',bg:'#080014',pc:['#9c27b0','#ce93d8','#e040fb','rgba(195,90,255,.5)','#7b1fa2']},
-  Gold:  {c:'#f0d080',g:'#fff8c0',bg:'#0c0a00',pc:['#f0d080','#ffd700','#c9a84c','rgba(240,200,80,.6)','#e6be3c']},
+  Fire:  {c:'#b83a14',g:'#d95d32',bg:'#fbf5eb',pc:['#b83a14','#d95d32','#e08b46','rgba(184,58,20,.25)','#8a2207']},
+  Water: {c:'#106ba3',g:'#2589c4',bg:'#f0f6fa',pc:['#106ba3','#2589c4','#5faedb','rgba(16,107,163,.2)','#0a466b']},
+  Earth: {c:'#785420',g:'#966f38',bg:'#fcf9f2',pc:['#785420','#966f38','#b59257','rgba(120,84,32,.2)','#4f3410']},
+  Wind:  {c:'#1c7343',g:'#2da161',bg:'#f2fbf5',pc:['#1c7343','#2da161','#6bc492','rgba(28,115,67,.2)','#0f4727']},
+  Light: {c:'#a18c18',g:'#c4b033',bg:'#fffdf2',pc:['#a18c18','#c4b033','#e3d266','rgba(161,140,24,.15)','#6e5f0b']},
+  Arcane:{c:'#681da8',g:'#883ec4',bg:'#faf5ff',pc:['#681da8','#883ec4','#b070ebb','rgba(104,29,168,.2)','#430f70']},
+  Gold:  {c:'#2b2b2b',g:'#444444',bg:'#f4f1e3',pc:['#1a1a1a','#333333','#555555','rgba(0,0,0,0.1)','#000000']},
 };
 
 function getTheme(el) {
@@ -289,9 +292,9 @@ function resize() {
 function drawBg() {
   const s=S.sz, cx=s/2, cy=s/2, r=s/2-18;
   bgX.clearRect(0,0,s,s);
-  bgX.fillStyle='#06060f'; bgX.fillRect(0,0,s,s);
-  bgX.shadowColor='rgba(240,208,128,.38)'; bgX.shadowBlur=11;
-  bgX.strokeStyle='rgba(201,168,76,.72)'; bgX.lineWidth=2.3;
+  bgX.fillStyle='#f4f1e3'; bgX.fillRect(0,0,s,s);
+  bgX.shadowColor='rgba(0,0,0,.04)'; bgX.shadowBlur=4;
+  bgX.strokeStyle='rgba(26,26,26,.32)'; bgX.lineWidth=2.3;
   bgX.beginPath(); bgX.arc(cx,cy,r,0,Math.PI*2); bgX.stroke();
   bgX.shadowBlur=0;
   for (let i=0;i<8;i++) {
@@ -299,20 +302,21 @@ function drawBg() {
     bgX.beginPath();
     bgX.moveTo(cx+(r-2)*Math.cos(a), cy+(r-2)*Math.sin(a));
     bgX.lineTo(cx+(r-len)*Math.cos(a), cy+(r-len)*Math.sin(a));
-    bgX.strokeStyle=`rgba(201,168,76,${maj?.88:.42})`;
+    bgX.strokeStyle=`rgba(26,26,26,${maj?.65:.25})`;
     bgX.lineWidth=maj?2.2:1.5; bgX.stroke();
   }
   for (let i=0;i<32;i++) {
     if (i%4===0) continue;
     const a=(i/32)*Math.PI*2-Math.PI/2;
     const rx=cx+(r+10)*Math.cos(a), ry=cy+(r+10)*Math.sin(a);
-    if(rx>3&&rx<s-3&&ry>3&&ry<s-3){bgX.beginPath();bgX.arc(rx,ry,1.1,0,Math.PI*2);bgX.fillStyle='rgba(201,168,76,.28)';bgX.fill();}
+    if(rx>3&&rx<s-3&&ry>3&&ry<s-3){bgX.beginPath();bgX.arc(rx,ry,1.1,0,Math.PI*2);bgX.fillStyle='rgba(26,26,26,.18)';bgX.fill();}
   }
-  bgX.strokeStyle='rgba(201,168,76,.07)'; bgX.lineWidth=.9; bgX.setLineDash([3,7]);
+  bgX.strokeStyle='rgba(26,26,26,.08)'; bgX.lineWidth=.9; bgX.setLineDash([3,7]);
   bgX.beginPath(); bgX.arc(cx,cy,r*.55,0,Math.PI*2); bgX.stroke(); bgX.setLineDash([]);
-  bgX.strokeStyle='rgba(201,168,76,.09)'; bgX.lineWidth=.9;
+  bgX.strokeStyle='rgba(26,26,26,.06)'; bgX.lineWidth=.9;
   bgX.beginPath(); bgX.moveTo(cx-15,cy); bgX.lineTo(cx+15,cy); bgX.stroke();
-  bgX.beginPath(); bgX.moveTo(cx,cy-15); bgX.lineTo(cx,cy+15); bgX.stroke();
+  bgX.beginPath(); bgX.moveTo(cx,cy-15); bgX.lineTo(cx,cy+15);
+  bgX.stroke();
 }
 
 // ═══════════ STROKE RENDERING ═══════════
@@ -321,7 +325,6 @@ function redrawAll() {
   S.strokes.forEach(renderStroke);
 }
 
-// Smooth midpoint-bezier rendering (beautiful curves on redraw)
 function renderStroke(sk) {
   const pts=sk.pts;
   if (pts.length<2) return;
@@ -333,14 +336,14 @@ function renderStroke(sk) {
     for(let i=1;i<pts.length;i++) drX.lineTo(pts[i].x*S.sz,pts[i].y*S.sz);
     drX.stroke(); drX.globalCompositeOperation='source-over'; return;
   }
-  drX.shadowColor='rgba(240,208,128,.5)'; drX.shadowBlur=6;
-  drX.strokeStyle='rgba(201,168,76,.93)';
+  drX.shadowColor='rgba(0,0,0,.05)';
+  drX.shadowBlur=2;
+  drX.strokeStyle='rgba(26,26,26,.95)';
   if (pts.length===2) {
     drX.lineWidth=1.5+((pts[0].p||.5)+(pts[1].p||.5))/2*3.2;
     drX.beginPath(); drX.moveTo(pts[0].x*S.sz,pts[0].y*S.sz); drX.lineTo(pts[1].x*S.sz,pts[1].y*S.sz); drX.stroke();
     drX.shadowBlur=0; return;
   }
-  // midpoint bezier algorithm
   let mpx=(pts[0].x+pts[1].x)/2, mpy=(pts[0].y+pts[1].y)/2;
   drX.lineWidth=1.5+(pts[0].p||.5)*3.2;
   drX.beginPath(); drX.moveTo(pts[0].x*S.sz,pts[0].y*S.sz); drX.lineTo(mpx*S.sz,mpy*S.sz); drX.stroke();
@@ -358,18 +361,18 @@ function renderStroke(sk) {
   drX.shadowBlur=0;
 }
 
-// Live incremental segment (very dense with coalesced events)
 function drawLive(p0,p1,eraser,pres) {
   if(!p0||!p1) return;
   const lw=eraser?28:1.5+(pres||.5)*3.2;
   drX.lineCap='round'; drX.lineJoin='round'; drX.lineWidth=lw;
-  drX.beginPath(); drX.moveTo(p0.x*S.sz,p0.y*S.sz); drX.lineTo(p1.x*S.sz,p1.y*S.sz);
+  drX.beginPath();
+  drX.moveTo(p0.x*S.sz,p0.y*S.sz); drX.lineTo(p1.x*S.sz,p1.y*S.sz);
   if (eraser) {
     drX.globalCompositeOperation='destination-out'; drX.strokeStyle='rgba(0,0,0,1)'; drX.stroke();
     drX.globalCompositeOperation='source-over';
   } else {
-    drX.shadowColor='rgba(240,208,128,.5)'; drX.shadowBlur=5;
-    drX.strokeStyle='rgba(201,168,76,.93)'; drX.stroke(); drX.shadowBlur=0;
+    drX.shadowColor='rgba(0,0,0,.05)'; drX.shadowBlur=2;
+    drX.strokeStyle='rgba(26,26,26,.95)'; drX.stroke(); drX.shadowBlur=0;
   }
 }
 
@@ -391,7 +394,6 @@ drC.addEventListener('pointerdown',e=>{
 drC.addEventListener('pointermove',e=>{
   e.preventDefault(); setP(e.pressure);
   if(!S.cur) return;
-  // getCoalescedEvents for 120Hz+ point density (Apple Pencil, high-refresh)
   const evts=e.getCoalescedEvents?e.getCoalescedEvents():[e];
   for(const ce of evts){
     const pos=norm(ce);
@@ -456,8 +458,7 @@ function analyzeAccuracy(circles,forceZero){
   const ink=S.strokes.filter(s=>!s.eraser&&s.pts.length>1);
   if(!ink.length) return null;
   const all=ink.flatMap(s=>s.pts);
-
-  // 1. Stroke Purity — high-frequency angular jitter between consecutive vectors
+  
   let jS=0,jN=0;
   for(const sk of ink){
     const pts=sk.pts;
@@ -472,8 +473,6 @@ function analyzeAccuracy(circles,forceZero){
     }
   }
   const strokePurity=Math.round(Math.max(0,Math.min(100,(1-(jN>0?jS/jN:0)/.52)*100)));
-
-  // 2. Seal Balance — 8-sector distribution
   const bcx=all.reduce((s,p)=>s+p.x,0)/all.length;
   const bcy=all.reduce((s,p)=>s+p.y,0)/all.length;
   const sec=new Array(8).fill(0);
@@ -481,14 +480,9 @@ function analyzeAccuracy(circles,forceZero){
   const bm=sec.reduce((a,b)=>a+b,0)/8;
   const bcv=bm>0?Math.sqrt(sec.reduce((s,v)=>s+(v-bm)**2,0)/8)/bm:1;
   const sealBalance=Math.round(Math.max(0,Math.min(100,(1-Math.min(bcv,1.4)/1.4)*100)));
-
-  // 3. Ring Precision
   const best=circles.length>0?circles[0]:null;
   const ringPrecision=best?Math.round(best.score*100):0;
   const hasRing=ringPrecision>=18;
-
-  // 4. Line Confidence — window perpendicular deviation (COMPLETELY SPEED-INDEPENDENT)
-  // Measures wobble/trembling, not how fast or slow you draw a line
   const lcScores=[];
   const W=8, step=Math.max(1,Math.floor(W/2));
   for(const sk of ink){
@@ -508,20 +502,15 @@ function analyzeAccuracy(circles,forceZero){
     }
   }
   const lineConf=lcScores.length>0?Math.round(lcScores.reduce((a,b)=>a+b)/lcScores.length*100):75;
-
-  // 5. Potency — ring presence is heavily weighted
-  const potency=hasRing
-    ?Math.round(.27*strokePurity+.24*sealBalance+.25*ringPrecision+.24*lineConf)
-    :Math.round((.38*strokePurity+.32*sealBalance+.30*lineConf)*.38);
-
+  const potency=hasRing ?Math.round(.27*strokePurity+.24*sealBalance+.25*ringPrecision+.24*lineConf) :Math.round((.38*strokePurity+.32*sealBalance+.30*lineConf)*.38);
   return{strokePurity,sealBalance,ringPrecision,lineConf,potency,hasRing,grade:gradeOf(potency)};
 }
 
 function gradeOf(p){
-  if(p>=90)return{l:'Master Sigil',d:'A transcendent inscription. Your precision rivals the Three Wise themselves.'};
-  if(p>=74)return{l:'Expert Seal',d:'Practiced and confident. Worthy of a senior Pointed Hat apprentice.'};
-  if(p>=54)return{l:'Journeyman Mark',d:'Functional — though imperfections may shorten the spell\'s duration or potency.'};
-  if(p>=34)return{l:'Apprentice Scratch',d:'Rough and trembling. The spell may misfire or lose power unpredictably.'};
+  if(p>90)return{l:'Master Sigil',d:'A transcendent inscription. Your precision rivals the Three Wise themselves.'};
+  if(p>74)return{l:'Expert Seal',d:'Practiced and confident. Worthy of a senior Pointed Hat apprentice.'};
+  if(p>54)return{l:'Journeyman Mark',d:'Functional — though imperfections may shorten the spell\'s duration or potency.'};
+  if(p>34)return{l:'Apprentice Scratch',d:'Rough and trembling. The spell may misfire or lose power unpredictably.'};
   return{l:'Unformed Scrawl',d:'The conjuring ink barely recognizes this shape. Begin again with a steadier hand.'};
 }
 
@@ -539,329 +528,186 @@ class Pt {
   tick(){
     this.life++;
     const e=this.el;
-    if(e.includes('fire')){this.vy-=.08;this.vx+=(Math.random()-.5)*.22;this.sz*=.989;}
-    else if(e.includes('water')){this.vy+=.06;this.vx*=.968;this.vx+=Math.sin(this.life*.15)*.14;}
-    else if(e.includes('wind')||e.includes('air')){
-      const a=Math.atan2(this.vy,this.vx)+.065,sp=Math.hypot(this.vx,this.vy)*.982;
-      this.vx=Math.cos(a)*sp;this.vy=Math.sin(a)*sp;
-    }
-    else if(e.includes('earth')||e.includes('crystal')||e.includes('sand')){this.vy+=.14;this.vx*=.965;}
-    else if(e.includes('light')){this.vx*=.92;this.vy*=.92;this.sz*=.962;}
-    else if(e.includes('gold')||e.includes('sign')){this.vx*=.93;this.vy*=.93;this.sz*=.97;}
-    else{const a=Math.atan2(this.vy,this.vx)+.05,sp=Math.hypot(this.vx,this.vy)*.976;this.vx=Math.cos(a)*sp;this.vy=Math.sin(a)*sp;}
-    this.x+=this.vx;this.y+=this.vy;this.rot+=this.rS;
-    return this.life<this.maxL;
+    if(e.includes('fire')){this.vy-=.08;this.vx+=(Math.random()-.5)*.25;}
+    else if(e.includes('water')){this.vy+=.04;this.vx+=(Math.random()-.5)*.4;}
+    else if(e.includes('wind')){this.vx+=Math.sin(this.life*.15)*.35;this.vy-=.03;}
+    this.x+=this.vx;this.y+=this.vy;this.vx*=.96;this.vy*=.96;this.rot+=this.rS;
   }
   draw(ctx){
-    const t=this.life/this.maxL;
-    ctx.save();ctx.globalAlpha=Math.sin(t*Math.PI)*.88;
-    ctx.translate(this.x,this.y);ctx.rotate(this.rot);
-    ctx.fillStyle=this.col;ctx.shadowColor=this.col;ctx.shadowBlur=this.sz*3;
-    ctx.beginPath();
-    if(this.el.includes('light')||this.el.includes('gold')||this.el.includes('sign')){
-      const r=this.sz*(1-t*.45),r2=r*.38;ctx.moveTo(0,-r);
-      for(let i=1;i<8;i++){const a=(i*Math.PI/4)-Math.PI/2,rr=i%2===0?r:r2;ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr);}
-      ctx.closePath();
-    } else if(this.el.includes('earth')||this.el.includes('crystal')||this.el.includes('sand')){
-      const r=this.sz*(1-t*.4);ctx.rect(-r*.7,-r*.7,r*1.4,r*1.4);
-    } else {ctx.arc(0,0,this.sz*(1-t*.5),0,Math.PI*2);}
-    ctx.fill();ctx.restore();
+    const alpha=Math.max(0,1-this.life/this.maxL);
+    ctx.save(); ctx.translate(this.x,this.y); ctx.rotate(this.rot);
+    ctx.globalAlpha=alpha; ctx.fillStyle=this.col;
+    if(this.el.includes('fire')||this.el.includes('light')){
+      ctx.shadowColor=this.col; ctx.shadowBlur=6;
+    }
+    ctx.fillRect(-this.sz/2,-this.sz/2,this.sz,this.sz); ctx.restore();
   }
 }
 
-function spawnParts(allEls,signsOnly){
-  const s=S.sz,cx=s/2,cy=s/2;
-  let batches=[];
-  if(signsOnly){batches=[{cols:TH.Gold.pc,el:'gold-sign',n:80}];}
-  else if(allEls&&allEls.length>1){
-    const perEl=Math.max(16,Math.floor(55/allEls.length));
-    for(const el of allEls){batches.push({cols:getTheme(el).pc,el:el.toLowerCase(),n:perEl});}
-  } else {
-    const el=(allEls&&allEls[0])||'arcane';
-    batches=[{cols:getTheme(el).pc,el:el.toLowerCase(),n:80}];
-  }
-  for(const{cols,el,n}of batches){
-    for(let i=0;i<n;i++){
-      const fromRing=Math.random()>.28;
-      let px,py;
-      if(fromRing){const r=s/2-18,a=Math.random()*Math.PI*2;px=cx+r*Math.cos(a);py=cy+r*Math.sin(a);}
-      else{px=cx+(Math.random()-.5)*120;py=cy+(Math.random()-.5)*120;}
-      S.particles.push(new Pt(px,py,cols,el));
+function spawnFx(el,circles){
+  const t=getTheme(el); S.particles=[];
+  if(circles&&circles.length>0){
+    const c=circles[0];
+    for(let a=0;a<Math.PI*2;a+=.045){
+      if(Math.random()>.45)continue;
+      const px=c.cx*S.sz+c.mr*Math.cos(a), py=c.cy*S.sz+c.mr*Math.sin(a);
+      S.particles.push(new Pt(px,py,t.pc,el));
+    }
+  }else{
+    const ink=S.strokes.filter(s=>!s.eraser);
+    if(ink.length>0){
+      for(let i=0;i<60;i++){
+        const sk=ink[Math.floor(Math.random()*ink.length)];
+        const pt=sk.pts[Math.floor(Math.random()*sk.pts.length)];
+        S.particles.push(new Pt(pt.x*S.sz,pt.y*S.sz,t.pc,el));
+      }
     }
   }
-  if(!S.fxId) fxLoop();
+  if(S.fxId){cancelAnimationFrame(S.fxId);S.fxId=null;}
+  loopFx();
 }
 
-function fxLoop(){
+function loopFx(){
   fxX.clearRect(0,0,S.sz,S.sz);
-  S.particles=S.particles.filter(p=>p.tick());
+  S.particles.forEach(p=>p.tick());
+  S.particles=S.particles.filter(p=>p.life<p.maxL);
   S.particles.forEach(p=>p.draw(fxX));
-  if(S.particles.length>0) S.fxId=requestAnimationFrame(fxLoop);
-  else{S.fxId=null;fxX.clearRect(0,0,S.sz,S.sz);}
+  if(S.particles.length>0) S.fxId=requestAnimationFrame(loopFx);
 }
 
-// ═══════════ WHA PROMPT ═══════════
-const PROMPT=`You are the foremost glyph scholar in the world of Witch Hat Atelier (Tongari Boushi no Atorie) by Kamome Shirahama. Analyze hand-drawn spell glyphs with complete canonical precision and return ONLY a JSON object.
-
-CORE RULES:
-- Magic requires only Conjuring Ink (from Silverwood Tree) and drawing skill — anyone can cast
-- Spell activates ONLY when ring is fully closed (or two split halves joined)
-- Larger seals = more powerful. Neater seals = last longer. Unequal signs = misfire toward longer side
-- Reversing a sign's orientation reverses its effect
-- Two identical spells with all signs inverted cancel each other out
-- Two seals connected by a drawn line combine their effects
-
-ANATOMY OF A GLYPH:
-1. SIGIL (center): determines the element
-2. SIGNS/KEYSTONES (surrounding sigil): determine how element manifests
-3. RING (drawn circle): activates the spell when complete
-
-CRITICAL: The decorative ring at the canvas edge is the APP BORDER — NOT the spell ring. Only count user-drawn inner circles as spell rings.
-
-THE FIVE MAIN SIGILS:
-FIRE SIGIL: Angular crossed lines forming diamond/X shape with flame-like branch tips. Resembles a stylized fire cross or angular starburst. → combustion, explosive heat, projectile fire, heat-based light.
-WATER SIGIL: Flowing vertical stroke with horizontal undulating wave branches. Like a stylized river-current symbol. → liquid jets, pressure waves, mist, directional water streams.
-EARTH SIGIL: Downward-pointing triangle or stacked horizontal ground-layer lines beneath a triangular top. Geometric mountain/ground symbol. → stone, sand, soil, dust, crystal, walls, structural matter.
-WIND/AIR SIGIL: Curving directional arrows or swirling marks indicating air movement. Stylized gust or spiral-arrow. → air currents, propulsion, levitation, atmospheric pressure. Variants: Wind Underfoot (foot-propulsion in Sylph Shoes), Aeriforms (mist/gas barriers).
-LIGHT SIGIL: Radiating lines from a central point — starburst, cross-with-rays, or simplified sun. → illumination, reflection, bending light, invisibility, blinding, scrying.
-SIGN-AS-SIGIL: Vision, Repetition, Billowing can occupy the center position as the primary element (no elemental sigil used). This is valid and known in canon.
-
-ALL KNOWN SIGNS/KEYSTONES (35+ canonical):
-OFFICIALLY NAMED:
-COLUMN — Parallel elongated bracket/line marks all pointing same direction. Creates focused high-speed beam of element (like a hose vs bucket). Unequal column lengths = spell fires toward the longer sign.
-DISPERSION — Curved arc/bracket facing in or out. Releases element in ALL directions simultaneously. Inverted closely mimics Column (seen in Snugstone seal). Reversed = inward vacuum/pull.
-LEVITATION — Arrow-like mark facing INWARD. For Fire/Water/Light: levitates generated element above seal. For Wind/Air: levitates the object the seal is drawn on. Sign size determines lifting capacity.
-PULL — Inward-pointing arrow attracting element. Reversed (outward-pointing) = repels element.
-CRUSH — Compressing marks inward. Crushes/compresses same-type elements together with force. Used for disintegration with Earth.
-FLOAT — Gentle suspension marks. Lighter than Levitation; for light/small objects.
-CONVERGENCE — Lines converging to a focal point. Concentrates maximum energy/element at one spot.
-COLLECTION — Gathering marks pulling element together from wide area into concentrated mass.
-BILLOWING — Large expanding curved marks. Produces massive VOLUMES of element — eruption, flood, avalanche scale.
-REPETITION — Loop/cyclical marks or concentric circle. Sustains/repeats spell continuously until ink depletes. CAN serve as the central element (replacing sigil) in the Repetition Seal.
-VISION — Detailed eye/lens shape. Enables optical effects, scrying, vision transmission, illusion, seeing through surfaces.
-WEAVE — Interlaced crossing lines forming lattice. Interlocks effects; creates mesh/woven manifestation.
-ENLARGE — Outward expanding arrows or growth marks. Makes element physically larger. With Window sigil: enlarges the physical object. Reversed = SHRINKS (used in Spell of Reduction).
-RAIN — Downward falling drop or streak marks. Causes element to fall from above like precipitation.
-BIRD — Wing-shaped or bird-silhouette marks. Element moves in graceful bird-like arcing flight paths, often splitting into formations.
-DANCING PUPPET — Dynamic dart-like marks suggesting animated motion. Element darts and moves unpredictably, like animated independent objects.
-REGION — Boundary-defining marks. Limits spell effect to a specific defined zone.
-ENTWINE — Spiral or coiling marks. Wraps element around a target in spiral motion.
-SIGN OF WIND — Wind-specific sign channeling directional air flow.
-AERIFORMS DEFINED — Maintains gas/mist clouds within a defined area.
-GATHER — Wide-area collecting marks pulling element in from far away.
-GLAIVES — Claw-shaped protrusions. Nearly forgotten since Day of the Pact; determines how firmly a spell embeds in a body (body-affecting magic component — almost always FORBIDDEN).
-UNOFFICIALLY NAMED (appear in manga art):
-DIAMOND — Rhombus shapes. Wider = wider area of effect. More diamonds = broader coverage.
-WINDOW — Rectangular frame. Defines area/boundary. Combined with Enlarge = physically enlarges the object.
-CROSSHAIR — Cross-shaped targeting marks. Improves precision and accuracy of spell direction.
-RADIAL — Lines radiating from sigil. INWARD-facing = diminishes element. OUTWARD-facing = AMPLIFIES element.
-BOLT — Zigzag lightning-bolt shapes. Rapid high-energy projectile discharge of element.
-EYE — Oval eye shape. Enhances sight, perception, or optical aspects.
-BEND — Curved redirecting arc. Redirects spell mid-flight to change direction.
-LINK — Connecting line joining two seals so their effects combine.
-BIND — Constraining/shackle-like marks. Traps or prevents movement of targets.
-ORB — Circular formation marks. Creates spherical/orb-shaped manifestation.
-PURIFY — Cleansing marks. Neutralizes or removes element's negative effects.
-
-SIGN RULES:
-- Directional signs (Column, Levitation, Pull, Bolt): facing direction matters critically
-- Semi-directional (Dispersion, Billowing, Rain): in/out orientation changes effect
-- Non-directional (Diamond, Repetition, Weave, Radial, Window): placement matters, not direction
-- Asymmetric (Bird, Dancing Puppet): valid even asymmetric, may cause unstable spell
-- More signs (even if messy) can compensate for unsteady drawing — canonical (Euini technique)
-
-ALL NAMED CANONICAL SPELLS:
-FIRE: Pyreball Seal (Fire + Levitation + Column → levitating fireball projectile)
-WATER: Water Pen (Water + Dispersion + Levitation → water spreads omnidirectionally upward); Tidal Column (Water + Column → focused high-pressure water jet)
-EARTH: Wall Breaker Seal (Earth + Column → shatters stone walls); Integration Seal (Earth + Gather → reconstitutes objects from dust/fragments); Wall Bend (Earth + Bend → reshapes solid walls); Sand Bridge (Earth/Sand + Column + Direction → compressed-sand bridge structure); Sand Cage (Earth/Sand + Convergence + Bind → encloses target in sand); Boulder Stretch Rope (Earth + Column + Enlarge → stone stretches into rope form); Serpent's Bed of Sand (Earth/Sand + Coil/Convergence at center → animated undulating sand terrain)
-WIND: Sylph Shoes (Wind Underfoot + Levitation, split across shoe soles → sustained air-propulsion flight)
-LIGHT: Glowstone Seal (Light + Dispersion + Repetition → sustained ambient illumination contraption); Floatglow/Wall-Mounted Lamp (Light + Levitation + Repetition → levitating sustained light contraption); Bird of Light Beacon (Light + Dispersion + Bird → light moves in bird-like arcing formations); Mirror Mantle (Light + Bend + Convergence → deflects/reflects incoming spells); Cloak Spell (Light + Vision, nested glyph → bends light for invisibility)
-COMPOUND: Floating Expansion Seal (Levitation + Enlarge → lifts and magnifies objects); Spell of Reduction (Reversed Levitation + Reversed Enlarge → shrinks objects); Sealchair (multiple linked Earth/Air seals + connecting lines → animated furniture); Link Rings (split identical seals → activates when joined); Repetition Seal (Repetition sign as center element → sustains/loops enclosed effects)
-FORBIDDEN: Memory Erasure (Glaives + body-affecting → only permitted body-affecting spell, used by Knights Moralis only); Illusory Labyrinth (Vision + complex nested → traps in endless sensory illusion — FORBIDDEN); Petrification (Crystal/Earth → crystallizes living tissue — FORBIDDEN); Scalewolf Curse (body transformation magic — FORBIDDEN)
-
-MULTI-GLYPH RULES:
-NESTED: Inner ring inside outer ring. Inner activates when outer completes. Effects amplify.
-LINKED: Circles connected by drawn lines. Effects merge into compound spell. Activate simultaneously.
-LINKED ARRAY: 3+ circles in pattern (like image reference: large central + smaller side circles + connecting lines). Complex compound — identify each circle's sigil+signs, then describe combined effect.
-SEPARATE: Unconnected circles = independent spells cast at same moment.
-
-FORBIDDEN MAGIC — DAY OF THE PACT:
-The following are FORBIDDEN under the Day of the Pact and must be flagged as ethics:"Forbidden":
-1. Magic drawn directly on living skin or body (spell tattoos, drawing on a person)
-2. Magic that directly heals a living body (healing magic — explicitly forbidden, even well-intentioned)
-3. Magic that directly wounds/kills by manipulating biological tissue (e.g., petrification of a living being)
-4. Body transformation spells applied to living beings (human into creature, body modification)
-5. De-aging, aging, or life-extension spells
-6. Mind control, emotion manipulation, or consciousness-affecting spells
-7. Teleportation applied directly to a living body (teleportation through magical doors/windows/mirrors IS permitted)
-8. Large-scale irreversible environmental catastrophe at island scale or greater
-9. Spells that warp reality on a massive/fundamental level
-10. Memory erasure (ONLY the official Knights Moralis/Pointed Hat version is permitted)
-11. Creating dangerous monsters from living matter
-12. Any magic containing Glaives signs in a context suggesting body-embedding effects
-
-PERMITTED MAGIC (vast majority of spells):
-- Standard elemental manipulation on non-living matter
-- Structural magic (breaking/building non-living structures)
-- Utility, lighting, levitation, movement, temperature control
-- Environmental effects at small-to-medium scale (not island-level permanent devastation)
-- Combat spells not specifically designed to biologically destroy a body
-- Contraptions and tools
-- Memory erasure (official Pointed Hat version only)
-IMPORTANT DISTINCTION: A fireball that could incidentally burn someone = PERMITTED (moral responsibility is the caster's). A spell specifically designed to heal, transform, or directly destroy living biological tissue = FORBIDDEN.
-
-VALIDATION RULES:
-Set valid:false ONLY if ALL of these are true: no user-drawn ring visible, AND no marks resembling any WHA canonical sigil, AND no marks resembling any WHA canonical sign. Signs-only glyph (canonical sign shapes + ring, no elemental sigil) IS valid.
-
-RESPOND WITH ONLY THIS JSON OBJECT — no markdown, no extra text:
-{"valid":boolean,"invalidReason":"reason if false, null if valid","glyphCount":number,"glyphs":[{"sigil":"element or Signs-Only","signs":["list","of","identified","signs"],"arrangement":"radial/bilateral/asymmetric","ringPresent":boolean,"ringQuality":"well-formed/rough/incomplete/absent"}],"name":"Precise 2-5 word WHA-style spell name","element":"Fire|Water|Earth|Wind|Light|Arcane|Signs-Only|Multi","allElements":["every element detected across all glyphs"],"sigils_identified":"Exact description of what you observe in the center of each glyph and which element it corresponds to","signs_identified":"Exact description of each surrounding mark and precisely which WHA sign/keystone each represents","description":"2-3 sentences of exactly what this spell does physically — precise manifestation, direction, behavior, scale, duration, notable properties — in the scholarly voice of the Great Library of Spells","missing_elements":"Specific actionable feedback on what is absent or imprecise. If complete and well-formed, say so explicitly.","effect_type":"Combat|Utility|Movement|Environmental|Contraption|Forbidden|Compound","complexity":"Simple Glyph|Compound Seal|Linked Array|Nested Sigil|Forbidden Inscription","stability_note":"Specific observation about drawing quality and what real instability it would cause in the spell","ethics":"Permitted|Forbidden","ethics_reason":"Specific reason citing Day of the Pact rules — e.g. This spell directly alters living biological tissue, violating the Day of the Pact prohibition on body-affecting magic. OR Permitted — this is a localized earth manipulation spell with no effect on living beings.","lore_note":"One sentence of in-world WHA lore about this class of spell"}`;
-
-// ═══════════ API CALL ═══════════
-async function castGlyph(){
-  if(!S.hasDrawn||S.loading) return;
-  S.loading=true; setState('l');
-
-  const circles=detectCircles();
-  const multi=circles.length>1
-    ?`IMPORTANT: ~${circles.length} distinct circular paths detected — analyze ALL as nested/linked/array. Identify each circle's sigil and signs separately, then describe the combined compound effect.`:'';
-
-  const comp=document.createElement('canvas');
-  comp.width=bgC.width; comp.height=bgC.height;
-  const cx2=comp.getContext('2d'); cx2.drawImage(bgC,0,0); cx2.drawImage(drC,0,0);
-  const img=comp.toDataURL('image/jpeg',.93).split(',')[1];
-
-  let spell=null;
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1400,
-        system:PROMPT,
-        messages:[{role:'user',content:[
-          {type:'image',source:{type:'base64',media_type:'image/jpeg',data:img}},
-          {type:'text',text:`Analyze this glyph with full WHA canonical precision. The thin decorative outer ring at the canvas border is the APP BORDER — ignore it. Look for user-drawn inner circles, sigils, and signs only. ${multi} Return ONLY the JSON object.`}
-        ]}]
-      })
-    });
-    const data=await res.json();
-    const raw=data.content.map(c=>c.text||'').join('');
-    spell=JSON.parse(raw.replace(/```json|```/g,'').trim());
-  }catch(err){
-    spell={valid:false,invalidReason:'Connection to the Great Library failed. Check your connection and try again.',
-      glyphCount:0,glyphs:[],name:'—',element:'Arcane',allElements:['Arcane'],
-      sigils_identified:'Connection lost',signs_identified:'Connection lost',
-      description:'The scholar\'s link to the Great Library was severed mid-consultation.',
-      missing_elements:'Cannot assess.',effect_type:'Unknown',complexity:'Unknown',
-      stability_note:'Cannot assess.',ethics:'Permitted',
-      ethics_reason:'Cannot determine — connection to the Great Library failed.',lore_note:''};
-  }
-
-  const inv=spell&&spell.valid===false;
-  const circles2=detectCircles();
-  const acc=analyzeAccuracy(circles2,inv);
-  renderResult(spell,acc);
-
-  if(!inv&&spell){
-    const allEls=spell.allElements||[spell.element||'Arcane'];
-    const signsOnly=(spell.element||'').toLowerCase().includes('sign')||
-      ((spell.glyphs||[]).length>0&&spell.glyphs.every(g=>g.sigil==='Signs-Only'));
-    applyTheme(spell.element,allEls);
-    spawnParts(allEls,signsOnly);
-  }
-  S.loading=false;
+// ═══════════ STATE HANDLER ═══════════
+function setState(st){
+  document.getElementById('st-e').style.display=st==='e'?'flex':'none';
+  document.getElementById('st-l').style.display=st==='loading'?'flex':'none';
+  document.getElementById('st-r').style.display=st==='result'?'block':'none';
 }
 
-// ═══════════ UI ═══════════
-function setState(s){
-  document.getElementById('st-e').style.display=s==='e'?'flex':'none';
-  document.getElementById('st-l').style.display=s==='l'?'flex':'none';
-  document.getElementById('st-r').style.display=s==='r'?'block':'none';
-}
-
-function sc(id,val){
-  const v=Math.max(0,Math.min(100,Math.round(val||0)));
-  const f=document.getElementById('b'+id),n=document.getElementById('n'+id);
-  if(f)f.style.width=v+'%'; if(n)n.textContent=v;
-}
-
-function renderResult(spell,acc){
-  setState('r');
-  const el=document.getElementById('st-r');
-  el.classList.remove('rev'); void el.offsetWidth; el.classList.add('rev');
-
-  const inv=spell&&spell.valid===false;
-  document.getElementById('inv-p').style.display=inv?'block':'none';
-  if(inv) document.getElementById('inv-w').textContent=spell.invalidReason||
-    'No recognizable WHA sigils, signs, or user-drawn ring detected. Draw canonical shapes inside a closed ring.';
-
-  if(acc){
-    setTimeout(()=>{
-      sc('sm',acc.strokePurity); sc('ba',acc.sealBalance);
-      sc('rp',acc.ringPrecision); sc('lc',acc.lineConf); sc('po',acc.potency);
-      document.getElementById('r-g').textContent=acc.grade.l;
-      document.getElementById('r-gd').textContent=acc.grade.d;
-    },80);
-  }
-
-  // Ethics badge
-  const ethW=document.getElementById('eth-w');
-  if(!inv&&spell&&spell.ethics){
-    ethW.style.display='block';
-    const ebox=document.getElementById('ebox');
-    const isForbidden=spell.ethics==='Forbidden';
-    ebox.className='ebox '+(isForbidden?'f':'p');
-    document.getElementById('eico').textContent=isForbidden?'🚫':'✅';
-    const elblEl=document.getElementById('elbl');
-    elblEl.textContent=isForbidden?'Forbidden Magic':'Permitted Magic';
-    elblEl.className='elbl '+(isForbidden?'f':'p');
-    document.getElementById('ersn').textContent=spell.ethics_reason||'';
-  } else ethW.style.display='none';
-
-  const spP=document.getElementById('sp-p');
-  spP.style.display=inv?'none':'block';
-  if(!inv&&spell){
-    const tags=document.getElementById('r-tags'); tags.innerHTML='';
-    [spell.element,spell.effect_type,spell.complexity,
-      spell.glyphCount>1?spell.glyphCount+' Glyphs':null].filter(Boolean).forEach(t=>{
-      const s=document.createElement('span');s.className='tag';s.textContent=t;tags.appendChild(s);
-    });
-    document.getElementById('r-name').textContent=spell.name||'Unnamed Glyph';
-    document.getElementById('r-desc').textContent=spell.description||'—';
-    const lines=[];
-    if(spell.sigils_identified) lines.push('Sigil  →  '+spell.sigils_identified);
-    if(spell.signs_identified)  lines.push('Signs  →  '+spell.signs_identified);
-    if(spell.stability_note)    lines.push(spell.stability_note);
-    document.getElementById('r-parts').textContent=lines.join('\n\n');
-    const mEl=document.getElementById('r-miss');
-    const miss=spell.missing_elements||'';
-    if(miss.length>2&&!/^n\/a|none|complete|well.formed/i.test(miss)){
-      mEl.style.display='block';mEl.textContent='⚠ '+miss;
-    } else mEl.style.display='none';
-    const lEl=document.getElementById('r-lore');
-    if(spell.lore_note&&spell.lore_note.length>3){lEl.style.display='block';lEl.textContent='"'+spell.lore_note+'"';}
-    else lEl.style.display='none';
-  }
-}
-
-function applyTheme(el,allEls){
-  const multi=allEls&&allEls.length>1;
-  const th=multi?TH.Arcane:getTheme(el);
-  document.documentElement.style.setProperty('--el',th.c);
-  document.documentElement.style.setProperty('--eg',th.g);
-  document.documentElement.style.setProperty('--eb',th.bg);
-  document.body.style.background=th.bg;
-  document.getElementById('ca').style.background=th.bg;
-  rgEl.style.boxShadow=`0 0 55px ${th.c}5a,0 0 110px ${th.c}20`;
-  rgEl.style.background=`radial-gradient(circle,${th.c}12 0%,transparent 68%)`;
+function applyTheme(thName){
+  const t=getTheme(thName);
+  document.body.style.background=t.bg;
+  document.getElementById('ca').style.background=t.bg;
+  rgEl.style.boxShadow=`0 0 35px ${t.c}25`;
+  rgEl.style.background=t.bg;
 }
 
 function resetTheme(){
-  ['--el','--eg','--eb'].forEach(v=>document.documentElement.style.removeProperty(v));
   document.body.style.background='';
   document.getElementById('ca').style.background='';
   rgEl.style.boxShadow=''; rgEl.style.background='';
+}
+
+// ═══════════ FIXED CAST GLYPH (AI LEGIBILITY FIX) ═══════════
+async function castGlyph() {
+  if (!S.hasDrawn || S.loading) return;
+  
+  S.loading = true;
+  setState('loading');
+  
+  // 1. Instantiating a new internal off-screen layer matching the bounding viewport layout
+  const offCanvas = document.createElement('canvas');
+  offCanvas.width = S.sz * S.dpr;
+  offCanvas.height = S.sz * S.dpr;
+  const offCtx = offCanvas.getContext('2d');
+  offCtx.scale(S.dpr, S.dpr);
+  
+  // 2. Painting a solid paper background to guarantee the Vision AI doesn't render transparent pixels as pitch black
+  offCtx.fillStyle = '#f4f1e3';
+  offCtx.fillRect(0, 0, S.sz, S.sz);
+  
+  // 3. Composite layer drawings down sequentially 
+  offCtx.drawImage(bgC, 0, 0, S.sz, S.sz);
+  offCtx.drawImage(drC, 0, 0, S.sz, S.sz);
+  
+  // 4. Compress to a standard high-contrast Image String format
+  const base64Image = offCanvas.toDataURL('image/jpeg', 0.9);
+  
+  // Check geometry locally first
+  const circles = detectCircles();
+  const acc = analyzeAccuracy(circles, false);
+  
+  try {
+    // 5. Send payload containing base64 data URL to your backend API route
+    const response = await fetch('/api/identify-glyph', { 
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: base64Image })
+    });
+    
+    if (!response.ok) throw new Error('API processing error');
+    const aiData = await response.json();
+    
+    // Fallback if AI string returns unreadable
+    if (aiData.status === 'unreadable' || !aiData.spellName) {
+      showUnreadable("The glyph arrangement couldn't be parsed into operational Magic Forms.");
+      return;
+    }
+    
+    // Update Layout Elements with Results
+    document.getElementById('inv-p').style.display = 'none';
+    document.getElementById('sp-p').style.display = 'block';
+    
+    document.getElementById('r-name').innerText = aiData.spellName;
+    document.getElementById('r-desc').innerText = aiData.description;
+    document.getElementById('r-parts').innerText = `Core Sigil: ${aiData.coreSigil}\nSigns: ${aiData.signs.join(', ')}`;
+    
+    const tagsWrapper = document.getElementById('r-tags');
+    tagsWrapper.innerHTML = '';
+    aiData.tags.forEach(t => {
+      const el = document.createElement('span'); el.className = 'tag'; el.innerText = t; tagsWrapper.appendChild(el);
+    });
+    
+    // Display Accuracy Parameters
+    document.getElementById('r-g').innerText = acc.grade.l;
+    document.getElementById('r-gd').innerText = acc.grade.d;
+    document.getElementById('bsm').style.width = acc.strokePurity + '%'; document.getElementById('nsm').innerText = acc.strokePurity;
+    document.getElementById('bba').style.width = acc.sealBalance + '%'; document.getElementById('nba').innerText = acc.sealBalance;
+    document.getElementById('brp').style.width = acc.ringPrecision + '%'; document.getElementById('nrp').innerText = acc.ringPrecision;
+    document.getElementById('blc').style.width = acc.lineConf + '%'; document.getElementById('nlc').innerText = acc.lineConf;
+    document.getElementById('bpo').style.width = acc.potency + '%'; document.getElementById('npo').innerText = acc.potency;
+    
+    applyTheme(aiData.coreSigil);
+    spawnFx(aiData.coreSigil, circles);
+    setState('result');
+    
+  } catch (err) {
+    console.error(err);
+    // Graceful alternative fallback display layout using analytical metrics
+    if (acc && acc.potency > 25) {
+      document.getElementById('inv-p').style.display = 'none';
+      document.getElementById('sp-p').style.display = 'block';
+      document.getElementById('r-name').innerText = "Unregistered Manifestation";
+      document.getElementById('r-desc').innerText = "The pattern registers strong ink density but bypasses traditional Great Library classification indices.";
+      document.getElementById('r-parts').innerText = "Core Sigil: Latent\nSigns: Undefined Paths";
+      document.getElementById('r-g').innerText = acc.grade.l;
+      document.getElementById('r-gd').innerText = acc.grade.d;
+      document.getElementById('bpo').style.width = acc.potency + '%'; document.getElementById('npo').innerText = acc.potency;
+      applyTheme('Arcane');
+      spawnFx('Arcane', circles);
+      setState('result');
+    } else {
+      showUnreadable("Connection severed or inscription failed to form stable baseline parameters.");
+    }
+  } finally {
+    S.loading = false;
+  }
+}
+
+function showUnreadable(msg) {
+  document.getElementById('inv-p').style.display = 'block';
+  document.getElementById('sp-p').style.display = 'none';
+  document.getElementById('inv-w').innerText = msg;
+  
+  const acc = analyzeAccuracy(detectCircles(), true);
+  document.getElementById('r-g').innerText = acc.grade.l;
+  document.getElementById('r-gd').innerText = acc.grade.d;
+  document.getElementById('bsm').style.width = '0%'; document.getElementById('nsm').innerText = '0';
+  document.getElementById('bba').style.width = '0%'; document.getElementById('nba').innerText = '0';
+  document.getElementById('brp').style.width = '0%'; document.getElementById('nrp').innerText = '0';
+  document.getElementById('blc').style.width = '0%'; document.getElementById('nlc').innerText = '0';
+  document.getElementById('bpo').style.width = '0%'; document.getElementById('npo').innerText = '0';
+  
+  resetTheme();
+  setState('result');
 }
 
 // ═══════════ CONTROLS ═══════════
@@ -888,17 +734,8 @@ document.getElementById('btn-c').addEventListener('click',()=>{
 });
 document.getElementById('btn-cast').addEventListener('click',castGlyph);
 
-// Prevent browser scroll/zoom on canvas ONLY (buttons still work fine)
-drC.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
-drC.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
-
-// Responsive resize
-const ro=new ResizeObserver(()=>resize());
-ro.observe(document.getElementById('ca'));
-window.addEventListener('orientationchange',()=>setTimeout(resize,300));
-
-resize();
-setState('e');
+window.addEventListener('resize',resize);
+document.addEventListener('DOMContentLoaded',()=>{ resize(); });
 </script>
 </body>
 </html>
