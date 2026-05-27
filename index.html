@@ -784,14 +784,12 @@ function resetTheme(){
 
 // ═══════════ RENDER RESULT ═══════════
 function renderResult(spell, acc){
-  // Show result panel
   setState('r');
   const resEl=document.getElementById('st-r');
   resEl.classList.remove('rev'); void resEl.offsetWidth; resEl.classList.add('rev');
 
   const inv = !spell || spell.valid === false;
 
-  // Invalid panel
   document.getElementById('inv-p').style.display = inv ? 'block' : 'none';
   if(inv){
     document.getElementById('inv-w').textContent =
@@ -799,7 +797,6 @@ function renderResult(spell, acc){
       'No recognizable WHA sigils, signs, or user-drawn ring detected. Draw canonical shapes inside a closed ring.';
   }
 
-  // Accuracy scores (always shown)
   if(acc){
     setTimeout(()=>{
       setSc('sm', acc.strokePurity);
@@ -812,7 +809,6 @@ function renderResult(spell, acc){
     }, 80);
   }
 
-  // Ethics badge
   const ethW = document.getElementById('eth-w');
   if(!inv && spell && spell.ethics){
     ethW.style.display = 'block';
@@ -828,12 +824,10 @@ function renderResult(spell, acc){
     ethW.style.display = 'none';
   }
 
-  // Spell identification panel
   const spP = document.getElementById('sp-p');
   spP.style.display = inv ? 'none' : 'block';
 
   if(!inv && spell){
-    // Tags
     const tags = document.getElementById('r-tags');
     tags.innerHTML = '';
     [spell.element, spell.effect_type, spell.complexity,
@@ -879,24 +873,30 @@ function setSc(id, val){
   if(n) n.textContent=v;
 }
 
-// ═══════════ CAST GLYPH ═══════════
+// ═══════════ CAST GLYPH (Image Rendering Core Added) ═══════════
 async function castGlyph() {
   if (!S.hasDrawn || S.loading) return;
   S.loading = true;
   setState('l');
 
-  // Build composite image on white background
+  // Create an offscreen composite canvas sized matching local canvas dimensions
   const offCanvas = document.createElement('canvas');
   offCanvas.width = S.sz * S.dpr;
   offCanvas.height = S.sz * S.dpr;
   const offCtx = offCanvas.getContext('2d');
+  
+  // Scale resolution to preserve high crispness ratio
   offCtx.scale(S.dpr, S.dpr);
+  
+  // Paint background parchment context
   offCtx.fillStyle = '#f4f1e3';
   offCtx.fillRect(0, 0, S.sz, S.sz);
+  
+  // Flatten layers down into single composite snapshot
   offCtx.drawImage(bgC, 0, 0, S.sz, S.sz);
   offCtx.drawImage(drC, 0, 0, S.sz, S.sz);
 
-  // base64Image — full data URL including prefix
+  // Extract base64 image data string explicitly formatted as a compact JPEG payload
   const base64Image = offCanvas.toDataURL('image/jpeg', 0.9);
 
   const circles = detectCircles();
@@ -916,13 +916,12 @@ async function castGlyph() {
 
     const raw = await res.text();
     
-    // Clean string response safely before parsing
     let cleanJsonStr = raw.trim();
     if (cleanJsonStr.includes("```")) {
-      cleanJsonStr = cleanJsonStr.replace(/```json/gi, '').replace(/```/g, '').trim();
+      cleanJsonStr = cleanJsonStr.replace(/
+```json/gi, '').replace(/```/g, '').trim();
     }
     
-    // Secondary safety: Parse JSON safely
     const spell = JSON.parse(cleanJsonStr);
 
     renderResult(spell, acc);
@@ -940,6 +939,7 @@ async function castGlyph() {
     S.loading = false;
   }
 }
+
 // ═══════════ CONTROLS ═══════════
 document.getElementById('btn-p').addEventListener('click',()=>{
   S.tool='pen';
