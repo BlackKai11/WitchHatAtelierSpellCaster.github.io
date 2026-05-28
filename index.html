@@ -885,7 +885,9 @@ async function castGlyph() {
   S.loading = true;
   setState('l');
 
-  // Build composite image on white background
+  // Let the browser finish any remaining line rendering cycles
+  await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 50)));
+
   const offCanvas = document.createElement('canvas');
   offCanvas.width = S.sz * S.dpr;
   offCanvas.height = S.sz * S.dpr;
@@ -897,8 +899,7 @@ async function castGlyph() {
   offCtx.drawImage(drC, 0, 0, S.sz, S.sz);
 
   // base64Image — full data URL including prefix
-  const base64Image = offCanvas.toDataURL('image/jpeg', 0.9);
-
+  const base64Image = offCanvas.toDataURL('image/png');
   const circles = detectCircles();
   const acc = analyzeAccuracy(circles, false);
 
